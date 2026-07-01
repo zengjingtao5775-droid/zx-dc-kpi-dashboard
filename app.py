@@ -20,14 +20,28 @@ GOOGLE_SHEET_URL = (
     "https://docs.google.com/spreadsheets/d/"
     "1msT7WcjkYva2yojVNrET2xJfqRS00xH85j1D85Ne36Q/edit?usp=sharing"
 )
+DECATHLON_BLUE = "#0082C3"
+DECATHLON_DARK_BLUE = "#005A9C"
+PALE_BLUE = "#EFF8FD"
 GREEN = "#54B435"
 DARK_GREEN = "#1F7A3D"
 YELLOW = "#F2C94C"
+ORANGE = "#F2994A"
+PINK = "#F36FB4"
 RED = "#EB5757"
-BLUE = "#2F80ED"
-INK = "#16302B"
-MUTED = "#6B7C78"
+BLUE = DECATHLON_BLUE
+INK = "#12324A"
+MUTED = "#5E7482"
 DATA_SCHEMA_VERSION = 4
+
+ROLE_STYLE = {
+    "IE": {"zh": "工程", "color": PINK},
+    "PIS": {"zh": "产品导入", "color": GREEN},
+    "Modelist": {"zh": "版师", "color": ORANGE},
+    "Designer": {"zh": "设计", "color": DECATHLON_BLUE},
+    "Design": {"zh": "设计", "color": DECATHLON_BLUE},
+}
+TEAM_LABEL = "Team Total<br><sup>团队整体</sup>"
 
 
 st.set_page_config(
@@ -40,45 +54,52 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-      .stApp { background: #F5F8F6; color: #16302B; }
-      [data-testid="stSidebar"] { background: #12372A; }
-      [data-testid="stSidebar"] * { color: #F4FFF7; }
+      .stApp { background: #EFF8FD; color: #12324A; }
+      [data-testid="stSidebar"] { background: #005A9C; }
+      [data-testid="stSidebar"] * { color: #F4FBFF; }
       [data-testid="stSidebar"] .stButton button,
-      [data-testid="stSidebar"] .stDownloadButton button {
-        background: #E8F5EC; color: #12372A; border: 0;
+      [data-testid="stSidebar"] .stDownloadButton button,
+      [data-testid="stSidebar"] [data-testid="stLinkButton"] a {
+        background: #EAF7FF; color: #005A9C; border: 0;
       }
       [data-testid="stSidebar"] .stButton button *,
-      [data-testid="stSidebar"] .stDownloadButton button * {
-        color: #12372A !important;
+      [data-testid="stSidebar"] .stDownloadButton button *,
+      [data-testid="stSidebar"] [data-testid="stLinkButton"] a * {
+        color: #005A9C !important;
       }
       [data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {
-        background: #F4F8F5; border-color: #A9C4B4;
+        background: #F4FBFF; border-color: #A7D8F2;
       }
       [data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] * {
-        color: #315548 !important;
+        color: #164B68 !important;
       }
       [data-testid="stMetric"] {
-        background: white; border: 1px solid #DFE9E2; border-radius: 14px;
-        padding: 18px 20px; box-shadow: 0 5px 16px rgba(18,55,42,.05);
+        background: white; border: 1px solid #D6EAF5; border-radius: 14px;
+        padding: 18px 20px; box-shadow: 0 5px 16px rgba(0,130,195,.07);
         height: 138px; box-sizing: border-box;
         display: flex; flex-direction: column; justify-content: center;
       }
-      [data-testid="stMetricLabel"] { color: #64746F; }
-      [data-testid="stMetricValue"] { color: #16302B; }
-      .dashboard-title { font-size: 2.15rem; font-weight: 750; color: #16302B; }
-      .dashboard-subtitle { color: #6B7C78; margin-top: -8px; margin-bottom: 20px; }
+      [data-testid="stMetricLabel"] { color: #5E7482; }
+      [data-testid="stMetricValue"] { color: #12324A; }
+      .hero-panel {
+        background: linear-gradient(135deg, #0082C3 0%, #005A9C 100%);
+        border-radius: 18px; padding: 26px 30px; margin-bottom: 22px;
+        box-shadow: 0 12px 28px rgba(0,90,156,.18);
+      }
+      .dashboard-title { font-size: 2.15rem; font-weight: 750; color: #FFFFFF; }
+      .dashboard-subtitle { color: #E5F6FF; margin-top: 3px; }
       .section-note {
-        background: #EDF7F0; border-left: 4px solid #54B435; border-radius: 8px;
-        padding: 11px 14px; color: #315548; margin: 6px 0 14px;
+        background: #EAF7FF; border-left: 4px solid #0082C3; border-radius: 8px;
+        padding: 11px 14px; color: #164B68; margin: 6px 0 14px;
       }
       .status-chip {
         display: inline-block; border-radius: 999px; padding: 4px 10px;
-        background: #E7F5EB; color: #1F7A3D; font-size: .82rem; font-weight: 650;
+        background: #EAF7FF; color: #005A9C; font-size: .82rem; font-weight: 650;
       }
-      h1, h2, h3 { color: #16302B; }
+      h1, h2, h3 { color: #12324A; }
       div[data-testid="stPlotlyChart"] {
-        background: white; border: 1px solid #E2EAE5; border-radius: 14px;
-        padding: 8px; box-shadow: 0 5px 16px rgba(18,55,42,.04);
+        background: white; border: 1px solid #D6EAF5; border-radius: 14px;
+        padding: 8px; box-shadow: 0 5px 16px rgba(0,130,195,.05);
       }
     </style>
     """,
@@ -125,6 +146,42 @@ def format_axis(fig: go.Figure, height: int = 390) -> go.Figure:
 
 def empty_chart(message: str) -> None:
     st.info(message, icon="ℹ️")
+
+
+def role_key(job: object) -> str:
+    value = str(job)
+    lower_value = value.lower()
+    for key in ROLE_STYLE:
+        if key.lower() in lower_value:
+            return key
+    return value
+
+
+def role_info(job: object) -> dict[str, str]:
+    key = role_key(job)
+    return ROLE_STYLE.get(key, {"zh": "职位", "color": DECATHLON_DARK_BLUE})
+
+
+def job_legend_label(job: object) -> str:
+    key = role_key(job)
+    info = role_info(job)
+    return f"{key}<br><sup>{info['zh']}</sup>"
+
+
+def job_plain_label(job: object) -> str:
+    key = role_key(job)
+    info = role_info(job)
+    if key in ROLE_STYLE:
+        return f"{key}（{info['zh']}）"
+    return str(job)
+
+
+def job_color(job: object) -> str:
+    return role_info(job)["color"]
+
+
+def job_color_map(jobs: pd.Series | list[object]) -> dict[str, str]:
+    return {job_legend_label(job): job_color(job) for job in pd.Series(jobs).dropna().unique()}
 
 
 def format_kpi_value(value: float, metric_type: str) -> str:
@@ -175,6 +232,7 @@ def build_raw_monthly_table(data: pd.DataFrame) -> pd.DataFrame:
             "reason": "原因",
         }
     ).fillna(table["数据类型"])
+    table["职位"] = table["职位"].map(job_plain_label)
     return table
 
 
@@ -193,18 +251,18 @@ def build_reason_table(data: pd.DataFrame) -> pd.DataFrame:
     reasons = reasons.merge(counts, on=["Month", "Job", "Name"], how="left")
     reasons["Month"] = reasons["Month"].dt.strftime("%Y/%m")
     reasons["Count"] = reasons["Count"].fillna(0).map(lambda value: f"{value:g}")
+    display = reasons.rename(
+        columns={
+            "Month": "月份",
+            "Job": "职位",
+            "Name": "员工",
+            "Count": "未准时次数",
+            "Reason": "未准时提交原因",
+        }
+    )[["月份", "职位", "员工", "未准时次数", "未准时提交原因"]]
+    display["职位"] = display["职位"].map(job_plain_label)
     return (
-        reasons.rename(
-            columns={
-                "Month": "月份",
-                "Job": "职位",
-                "Name": "员工",
-                "Count": "未准时次数",
-                "Reason": "未准时提交原因",
-            }
-        )
-        [["月份", "职位", "员工", "未准时次数", "未准时提交原因"]]
-        .sort_values(["月份", "职位", "员工"], ascending=[False, True, True])
+        display.sort_values(["月份", "职位", "员工"], ascending=[False, True, True])
         .reset_index(drop=True)
     )
 
@@ -269,7 +327,7 @@ def build_attention_table(latest: pd.DataFrame) -> pd.DataFrame:
         ),
         axis=1,
     )
-    return (
+    display = (
         attention.sort_values("Severity", ascending=False)
         .rename(columns={"Job": "职位", "Name": "员工", "KPI": "二级KPI"})
         [
@@ -286,6 +344,8 @@ def build_attention_table(latest: pd.DataFrame) -> pd.DataFrame:
         ]
         .reset_index(drop=True)
     )
+    display["职位"] = display["职位"].map(job_plain_label)
+    return display
 
 
 with st.sidebar:
@@ -409,6 +469,9 @@ period_label = (
     if period_start == period_end
     else f"{period_start:%Y/%m}–{period_end:%Y/%m}"
 )
+period_month_labels = [
+    month.strftime("%Y/%m") for month in sorted(filtered["Month"].drop_duplicates())
+]
 previous_months = sorted(filtered.loc[filtered["Month"] < latest_month, "Month"].unique())
 previous_month = previous_months[-1] if previous_months else None
 latest_data = filtered[filtered["Month"].eq(latest_month)]
@@ -441,12 +504,13 @@ rft_delta = (
 )
 
 st.markdown(
-    '<div class="dashboard-title">ZX R&D KPI Dashboard</div>',
-    unsafe_allow_html=True,
-)
-st.markdown(
-    f'<div class="dashboard-subtitle">研发团队绩效监控 · 数据截止 {latest_month:%Y年%m月} · '
-    f'{len(selected_jobs)} 个职位 / {filtered["Name"].nunique()} 名员工</div>',
+    f"""
+    <div class="hero-panel">
+      <div class="dashboard-title">ZX R&amp;D KPI Dashboard</div>
+      <div class="dashboard-subtitle">研发团队绩效监控 · 数据截止 {latest_month:%Y年%m月} ·
+      {len(selected_jobs)} 个职位 / {filtered["Name"].nunique()} 名员工</div>
+    </div>
+    """,
     unsafe_allow_html=True,
 )
 
@@ -471,48 +535,57 @@ with tabs[0]:
         .groupby(["Month", "Job"], as_index=False)
         .agg(Value=("Value", "mean"))
     )
+    trend["MonthLabel"] = trend["Month"].dt.strftime("%Y/%m")
+    trend["JobLabel"] = trend["Job"].map(job_legend_label)
+    trend["JobPlain"] = trend["Job"].map(job_plain_label)
     overall = (
         filtered[filtered["MetricType"].eq("rate")]
         .groupby("Month", as_index=False)
         .agg(Value=("Value", "mean"))
     )
+    overall["MonthLabel"] = overall["Month"].dt.strftime("%Y/%m")
     fig_trend = px.line(
         trend,
-        x="Month",
+        x="MonthLabel",
         y="Value",
-        color="Job",
-        line_dash="Job",
-        symbol="Job",
+        color="JobLabel",
+        line_dash="JobLabel",
+        symbol="JobLabel",
         markers=True,
-        color_discrete_sequence=[GREEN, BLUE, YELLOW, "#9B51E0"],
-        labels={"Value": "平均达成率", "Month": "月份", "Job": "职位"},
+        custom_data=["JobPlain"],
+        color_discrete_map=job_color_map(trend["Job"]),
+        labels={"Value": "平均达成率", "MonthLabel": "月份", "JobLabel": "职位"},
         title="各职位比率类 KPI 月度表现",
     )
     fig_trend.update_traces(
         line=dict(width=3),
         marker=dict(size=8),
         hovertemplate=(
-            "<b>职位：%{fullData.name}</b><br>"
-            "月份：%{x|%Y/%m}<br>"
+            "<b>职位：%{customdata[0]}</b><br>"
+            "月份：%{x}<br>"
             "平均达成率：%{y:.1%}<extra></extra>"
         ),
     )
     fig_trend.add_trace(
         go.Scatter(
-            x=overall["Month"],
+            x=overall["MonthLabel"],
             y=overall["Value"],
-            name="团队整体",
+            name=TEAM_LABEL,
             mode="lines+markers",
             line=dict(color=INK, width=4, dash="dot"),
             marker=dict(size=9, symbol="diamond"),
             hovertemplate=(
                 "<b>团队整体</b><br>"
-                "月份：%{x|%Y/%m}<br>"
+                "月份：%{x}<br>"
                 "平均达成率：%{y:.1%}<extra></extra>"
             ),
         )
     )
-    fig_trend.update_xaxes(tickformat="%Y/%m")
+    fig_trend.update_xaxes(
+        type="category",
+        categoryorder="array",
+        categoryarray=period_month_labels,
+    )
     fig_trend.update_yaxes(
         tickformat=".0%",
         tick0=0.5,
@@ -524,11 +597,12 @@ with tabs[0]:
         config={"displayModeBar": False},
     )
 
-    left, right = st.columns([1.05, 1])
-    with left:
-        employee_source = filtered[
-            filtered["MetricType"].eq("rate") & filtered["Target"].notna()
-        ]
+    employee_source = filtered[
+        filtered["MetricType"].eq("rate") & filtered["Target"].notna()
+    ]
+    if employee_source.empty:
+        empty_chart("当前范围没有带目标值的比率类 KPI。")
+    else:
         employee = (
             employee_source
             .assign(
@@ -546,20 +620,24 @@ with tabs[0]:
         employee["Status"] = employee["Attainment"].ge(1).map(
             {True: "达标", False: "需关注"}
         )
+        employee["JobLabel"] = employee["Job"].map(job_legend_label)
+        employee["JobPlain"] = employee["Job"].map(job_plain_label)
+        attainment_max = employee["Attainment"].dropna().max()
+        attainment_range_max = max(1.12, float(attainment_max) * 1.12)
         fig_employee = px.bar(
             employee,
             x="Attainment",
             y="Name",
-            color="Status",
+            color="JobLabel",
             orientation="h",
             text=employee["Attainment"].map(lambda value: f"{value:.0%}"),
-            custom_data=["Job", "Months", "AverageRate"],
-            color_discrete_map={"达标": GREEN, "需关注": RED},
+            custom_data=["JobPlain", "Months", "AverageRate", "Status"],
+            color_discrete_map=job_color_map(employee["Job"]),
             title=f"个人目标达成指数 · {period_label}",
             labels={
                 "Attainment": "目标达成指数",
                 "Name": "员工",
-                "Job": "职位",
+                "JobLabel": "职位",
                 "Months": "有数据月份",
                 "AverageRate": "期间平均达成率",
                 "Status": "状态",
@@ -572,57 +650,27 @@ with tabs[0]:
                 "有数据月份：%{customdata[1]}<br>"
                 "期间平均达成率：%{customdata[2]:.1%}<br>"
                 "目标达成指数：%{x:.1%}<br>"
-                "状态：%{fullData.name}<extra></extra>"
+                "状态：%{customdata[3]}<extra></extra>"
             )
         )
-        fig_employee.add_vline(x=1, line_dash="dash", line_color=INK)
-        fig_employee.update_xaxes(tickformat=".0%")
+        fig_employee.update_traces(
+            textposition="inside",
+            insidetextanchor="middle",
+            cliponaxis=False,
+            textfont=dict(color="white", size=12),
+        )
+        fig_employee.add_vline(
+            x=1,
+            line_dash="dash",
+            line_color=INK,
+            annotation_text="目标线 100%",
+            annotation_position="top",
+        )
+        fig_employee.update_xaxes(tickformat=".0%", range=[0, attainment_range_max])
         st.plotly_chart(
-            format_axis(fig_employee, 390),
+            format_axis(fig_employee, 430),
             config={"displayModeBar": False},
         )
-
-    with right:
-        heat_source = filtered[filtered["MetricType"].eq("rate")]
-        heat = heat_source.pivot_table(
-            index="Name", columns="KPI", values="Value", aggfunc="mean"
-        )
-        if not heat.empty:
-            z = heat.to_numpy() * 100
-            text = [
-                ["" if pd.isna(value) else f"{value:.0f}%" for value in row]
-                for row in z
-            ]
-            fig_heat = go.Figure(
-                go.Heatmap(
-                    z=z,
-                    x=heat.columns,
-                    y=heat.index,
-                    text=text,
-                    texttemplate="%{text}",
-                    colorscale=[
-                        [0, "#FDE7E7"],
-                        [0.80, "#F7E7A7"],
-                        [0.95, "#D7F0D1"],
-                        [1, GREEN],
-                    ],
-                    zmin=50,
-                    zmax=100,
-                    colorbar=dict(title="%"),
-                    hovertemplate=(
-                        "<b>员工：%{y}</b><br>"
-                        "KPI：%{x}<br>"
-                        "期间平均：%{z:.1f}%<extra></extra>"
-                    ),
-                )
-            )
-            fig_heat.update_layout(title=f"KPI 期间平均热力图 · {period_label}")
-            st.plotly_chart(
-                format_axis(fig_heat, 390),
-                config={"displayModeBar": False},
-            )
-        else:
-            empty_chart("当前范围没有比率类 KPI。")
 
     st.markdown("### 未准时提交趋势")
     exception = filtered[filtered["MetricType"].eq("count")]
@@ -642,47 +690,64 @@ with tabs[0]:
         exception_monthly = exception_monthly.merge(
             reason_monthly, on=["Month", "Job", "Name"], how="left"
         )
+        exception_monthly["MonthLabel"] = exception_monthly["Month"].dt.strftime(
+            "%Y/%m"
+        )
         exception_monthly["Reason"] = exception_monthly["Reason"].fillna("未填写")
-        fig_exception = px.bar(
+        exception_monthly["JobPlain"] = exception_monthly["Job"].map(job_plain_label)
+        name_color_map = (
+            exception_monthly.drop_duplicates("Name")
+            .set_index("Name")["Job"]
+            .map(job_color)
+            .to_dict()
+        )
+        fig_exception = px.line(
             exception_monthly,
-            x="Month",
+            x="MonthLabel",
             y="Value",
             color="Name",
-            custom_data=["Job", "Reason"],
-            barmode="group",
-            color_discrete_sequence=px.colors.qualitative.Set2,
-            title="逾期/未准时提交次数（越低越好）",
-            labels={"Value": "次数", "Month": "月份", "Name": "员工"},
+            line_dash="Name",
+            symbol="Name",
+            markers=True,
+            custom_data=["JobPlain", "Reason"],
+            color_discrete_map=name_color_map,
+            title="未准时提交次数趋势（目标：每人每月 ≤ 2 次）",
+            labels={"Value": "次数", "MonthLabel": "月份", "Name": "员工"},
         )
         fig_exception.update_traces(
+            line=dict(width=3),
+            marker=dict(size=9),
             hovertemplate=(
                 "<b>员工：%{fullData.name}</b><br>"
                 "职位：%{customdata[0]}<br>"
-                "月份：%{x|%Y/%m}<br>"
+                "月份：%{x}<br>"
                 "未准时提交：%{y:.0f} 次<br>"
                 "原因：%{customdata[1]}<extra></extra>"
             )
         )
-        fig_exception.update_xaxes(tickformat="%Y/%m")
-        fig_exception.update_yaxes(dtick=1)
+        fig_exception.add_hline(
+            y=2,
+            line_dash="dash",
+            line_color=RED,
+            annotation_text="目标红线：≤2次/月",
+            annotation_position="top left",
+        )
+        fig_exception.update_xaxes(
+            type="category",
+            categoryorder="array",
+            categoryarray=period_month_labels,
+        )
+        fig_exception.update_yaxes(
+            dtick=1,
+            rangemode="tozero",
+            range=[0, max(3, float(exception_monthly["Value"].max()) + 0.8)],
+        )
         st.plotly_chart(
             format_axis(fig_exception, 350),
             config={"displayModeBar": False},
         )
     else:
         empty_chart("当前范围没有“次数”类异常指标。")
-
-    st.markdown(f"### 未准时提交原因 · {period_label}")
-    reason_table = build_reason_table(filtered)
-    if reason_table.empty:
-        st.info("当前筛选范围没有填写未准时提交原因。", icon="ℹ️")
-    else:
-        st.dataframe(
-            reason_table,
-            width="stretch",
-            hide_index=True,
-            height=min(380, 38 * (len(reason_table) + 1)),
-        )
 
     st.markdown(f"### 最新需关注清单 · {latest_month:%Y/%m}")
     attention_table = build_attention_table(latest_data)
@@ -701,7 +766,7 @@ with tabs[1]:
     modelist_col, designer_col = st.columns([1.25, 0.75])
 
     with modelist_col:
-        st.markdown("### Modelist：TP Qualification")
+        st.markdown("### Modelist（版师）：TP Qualification")
         modelist = latest_data[
             latest_data["Job"].str.contains("Modelist", case=False, na=False)
             & latest_data["MetricType"].eq("rate")
@@ -768,7 +833,7 @@ with tabs[1]:
             empty_chart("需要同时存在 PAP、TF、BOM 三项数据才能生成 Modelist 气泡图。")
 
     with designer_col:
-        st.markdown("### Designer：3D 品质")
+        st.markdown("### Designer（设计）：3D 品质")
         designer = latest_data[
             latest_data["Job"].str.contains("Designer", case=False, na=False)
             & latest_data["MetricType"].eq("rate")
@@ -808,36 +873,46 @@ with tabs[1]:
         else:
             empty_chart("当前范围没有 Designer 的比率数据。")
 
-    st.markdown("### PIS 与 IE 月度明细")
+    st.markdown("### PIS（产品导入）与 IE（工程）月度明细")
     focus = filtered[
         filtered["Job"].str.contains("PIS|IE", case=False, regex=True, na=False)
         & filtered["MetricType"].eq("rate")
     ]
     if not focus.empty:
+        focus = focus.copy()
+        focus["MonthLabel"] = focus["Month"].dt.strftime("%Y/%m")
+        focus["JobLabel"] = focus["Job"].map(job_legend_label)
+        focus["JobPlain"] = focus["Job"].map(job_plain_label)
         fig_focus = px.line(
             focus,
-            x="Month",
+            x="MonthLabel",
             y="Value",
             color="KPI",
-            facet_row="Job",
+            facet_row="JobLabel",
             markers=True,
+            custom_data=["JobPlain"],
             color_discrete_sequence=px.colors.qualitative.Safe,
             title="PIS / IE KPI 趋势",
             labels={
                 "Value": "达成率",
-                "Month": "月份",
+                "MonthLabel": "月份",
                 "KPI": "二级KPI",
-                "Job": "职位",
+                "JobLabel": "职位",
             },
         )
         fig_focus.update_traces(
             hovertemplate=(
                 "<b>KPI：%{fullData.name}</b><br>"
-                "月份：%{x|%Y/%m}<br>"
+                "职位：%{customdata[0]}<br>"
+                "月份：%{x}<br>"
                 "达成率：%{y:.1%}<extra></extra>"
             )
         )
-        fig_focus.update_xaxes(tickformat="%Y/%m")
+        fig_focus.update_xaxes(
+            type="category",
+            categoryorder="array",
+            categoryarray=period_month_labels,
+        )
         fig_focus.update_yaxes(tickformat=".0%", range=[0, 1.08])
         fig_focus.for_each_annotation(lambda annotation: annotation.update(text=annotation.text.split("=")[-1]))
         st.plotly_chart(
@@ -915,6 +990,7 @@ with tabs[2]:
                 "有数据月份",
             ]
         ]
+        display["职位"] = display["职位"].map(job_plain_label)
         st.dataframe(
             display,
             width="stretch",
@@ -955,6 +1031,7 @@ with tabs[2]:
                 "reason": "原因",
             }
         ).fillna(raw_display["数据类型"])
+        raw_display["职位"] = raw_display["职位"].map(job_plain_label)
         st.dataframe(
             raw_display[
                 ["月份", "职位", "员工", "二级KPI", "KPI分类", "数据类型", "数值"]
