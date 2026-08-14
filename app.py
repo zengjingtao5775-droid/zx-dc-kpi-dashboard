@@ -98,13 +98,18 @@ st.markdown(
       }
       .team-structure { font-size: .92rem; opacity: .98; }
       .module-summary {
-        display: flex; align-items: center; justify-content: space-between;
+        display: grid; grid-template-columns: 1fr auto; align-items: center;
         gap: 18px; margin: 12px 0 14px; padding: 12px 18px;
         background: #FFFFFF; border: 1px solid #D6EAF5; border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0,130,195,.05);
       }
       .module-summary-label { color: #5E7482; font-size: .88rem; }
       .module-summary-value { color: #12324A; font-size: 1.65rem; font-weight: 700; }
+      .module-driver {
+        grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap;
+        border-top: 1px solid #E5F0F6; padding-top: 9px; color: #12324A;
+        font-size: .86rem; font-weight: 650;
+      }
       .module-summary-zh { font-size: .78rem; opacity: .82; }
       .role-chip { display: inline-flex; align-items: center; margin-right: 12px; }
       .role-dot {
@@ -215,6 +220,8 @@ KPI_CHINESE = {
     "TP BOM ON TIME": "TP BOM 准时交付",
     "TP PAP RFT": "TP PAP 一次通过率",
     "TP PAP ON TIME": "TP PAP 准时交付",
+    "TP TF RFT": "TP TF 一次通过率",
+    "TP TF ON TIME": "TP TF 准时交付",
     "Marker RFT": "MARKER 一次通过率",
     "Marker ON TIME": "MARKER 准时交付",
     "SOT RFT": "SOT 一次通过率",
@@ -531,6 +538,13 @@ def render_rate_module(
 
     period_value = float(module_data["Value"].mean())
     targets = sorted(module_data["Target"].dropna().unique())
+    driver_row = module_data.sort_values(
+        ["Value", "Month"], ascending=[True, False]
+    ).iloc[0]
+    driver_label = (
+        f"{display_kpi(driver_row['KPI'])} · "
+        f"{driver_row['Month']:%Y/%m} · {percent(float(driver_row['Value']))}"
+    )
 
     st.markdown(
         f"""
@@ -542,6 +556,10 @@ def render_rate_module(
           <div style="text-align:right">
             <div class="module-summary-label">{tr("期间平均", "Period Average")}</div>
             <div class="module-summary-value">{percent(period_value)}</div>
+          </div>
+          <div class="module-driver">
+            <span class="module-summary-label">{tr("主要影响项", "Main Driver")}</span>
+            <span>{driver_label}</span>
           </div>
         </div>
         """,
@@ -604,10 +622,11 @@ def render_rate_module(
         categoryorder="array",
         categoryarray=period_month_labels,
     )
+    min_value = float(module_data["Value"].min())
     max_value = float(module_data["Value"].max())
     fig.update_yaxes(
         tickformat=".0%",
-        range=[0.5, max(1.04, max_value * 1.04)],
+        range=[0.0 if min_value < 0.5 else 0.5, max(1.04, max_value * 1.04)],
     )
     st.plotly_chart(
         format_axis(fig, 370),

@@ -36,6 +36,8 @@ class KPIDataTests(unittest.TestCase):
         self.assertEqual(classify_kpi("MARKER RFT"), ("rate", "RFT"))
         self.assertEqual(classify_kpi("MARKER ON TIME"), ("rate", "准时交付"))
         self.assertEqual(classify_kpi("TP BOM ON TIME"), ("rate", "准时交付"))
+        self.assertEqual(classify_kpi("TP TF RFT"), ("rate", "RFT"))
+        self.assertEqual(classify_kpi("TP TF ON TIME"), ("rate", "准时交付"))
         self.assertEqual(classify_kpi("SOT RFT"), ("rate", "RFT"))
         self.assertEqual(classify_kpi("SOT ON TIME"), ("rate", "准时交付"))
         self.assertEqual(target_for_kpi("SOT ON TIME", "rate"), 1.0)
