@@ -30,6 +30,7 @@ ORANGE = "#F2994A"
 PINK = "#F36FB4"
 RED = "#EB5757"
 BLUE = DECATHLON_BLUE
+DESIGNER_BLUE = "#2EA8E5"
 INK = "#12324A"
 MUTED = "#5E7482"
 DATA_SCHEMA_VERSION = 4
@@ -38,8 +39,8 @@ ROLE_STYLE = {
     "IE": {"zh": "工程", "color": PINK},
     "PIS": {"zh": "产品导入", "color": GREEN},
     "Modelist": {"zh": "版师", "color": ORANGE},
-    "Designer": {"zh": "设计", "color": DECATHLON_BLUE},
-    "Design": {"zh": "设计", "color": DECATHLON_BLUE},
+    "Designer": {"zh": "设计", "color": DESIGNER_BLUE},
+    "Design": {"zh": "设计", "color": DESIGNER_BLUE},
 }
 st.set_page_config(
     page_title="ZX R&D KPI Dashboard",
@@ -89,6 +90,34 @@ st.markdown(
         overflow-wrap: anywhere;
       }
       .team-structure { font-size: .93rem; opacity: .96; }
+      .role-chip { display: inline-flex; align-items: center; margin-right: 12px; }
+      .role-dot {
+        display: inline-block; width: 10px; height: 10px; border-radius: 3px;
+        margin-right: 5px; box-shadow: 0 0 0 1px rgba(255,255,255,.65);
+      }
+      [data-testid="stButtonGroup"] [role="radiogroup"] button {
+        border-width: 2px !important; font-weight: 650 !important;
+      }
+      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1) {
+        border-color: #2EA8E5 !important; background: #EAF7FF !important; color: #005A9C !important;
+      }
+      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2),
+      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3) {
+        border-color: #F2994A !important; background: #FFF3E8 !important; color: #A95108 !important;
+      }
+      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4),
+      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6) {
+        border-color: #54B435 !important; background: #EEF9EA !important; color: #1F7A3D !important;
+      }
+      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5) {
+        border-color: #F36FB4 !important; background: #FFF0F8 !important; color: #B3367D !important;
+      }
+      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1)[kind="pillsActive"] { background: #2EA8E5 !important; color: white !important; }
+      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2)[kind="pillsActive"],
+      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3)[kind="pillsActive"] { background: #F2994A !important; color: white !important; }
+      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4)[kind="pillsActive"],
+      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6)[kind="pillsActive"] { background: #54B435 !important; color: white !important; }
+      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5)[kind="pillsActive"] { background: #F36FB4 !important; color: white !important; }
       .section-note {
         background: #EAF7FF; border-left: 4px solid #0082C3; border-radius: 8px;
         padding: 11px 14px; color: #164B68; margin: 6px 0 14px;
@@ -603,11 +632,19 @@ for role in role_order:
         value for job, value in role_counts.items() if role_key(job) == role
     )
     if count:
-        role_summary_parts.append(f"{role} {count}人")
+        role_summary_parts.append(
+            '<span class="role-chip">'
+            f'<span class="role-dot" style="background:{job_color(role)}"></span>'
+            f"{role} {count}人</span>"
+        )
 for job, count in role_counts.items():
     if role_key(job) not in role_order:
-        role_summary_parts.append(f"{role_key(job)} {count}人")
-role_summary = " / ".join(role_summary_parts)
+        role_summary_parts.append(
+            '<span class="role-chip">'
+            f'<span class="role-dot" style="background:{job_color(job)}"></span>'
+            f"{role_key(job)} {count}人</span>"
+        )
+role_summary = "".join(role_summary_parts)
 
 st.markdown(
     f"""
@@ -624,18 +661,18 @@ tabs = st.tabs(["KPI 模块", "绩效明细", "数据说明"])
 
 with tabs[0]:
     module_options = [
-        "PIS · RFT 通过率",
-        "PIS · GO PROD / 开发准时率",
-        "IE · SOT PACE 交付准确率",
-        "Modelist · PAP / TF / BOM 一次通过率",
-        "Designer · 3D 交付准确率",
-        "Overall · 个人目标达成",
-        "RFT · 未准时提交",
+        "3D RFT",
+        "TP RFT",
+        "TP on time",
+        "SSS RFT",
+        "PPS RFT",
+        "GO PROD on time",
     ]
+    if st.session_state.get("selected_kpi_module") not in module_options:
+        st.session_state["selected_kpi_module"] = module_options[0]
     selected_module = st.pills(
         "选择 KPI 模块（点击后仅显示该模块）",
         module_options,
-        default=module_options[0],
         selection_mode="single",
         key="selected_kpi_module",
     ) or module_options[0]
@@ -645,10 +682,10 @@ with tabs[0]:
         unsafe_allow_html=True,
     )
 
-    if selected_module == "PIS · RFT 通过率":
+    if selected_module == "3D RFT":
         module_data = filtered[
-            filtered["Job"].map(role_key).eq("PIS")
-            & filtered["KPIGroup"].eq("RFT")
+            filtered["Job"].map(role_key).eq("Designer")
+            & filtered["KPI"].str.contains("3D", case=False, na=False)
         ]
         render_rate_module(
             module_data,
@@ -657,31 +694,7 @@ with tabs[0]:
             period_label,
             period_month_labels,
         )
-    elif selected_module == "PIS · GO PROD / 开发准时率":
-        module_data = filtered[
-            filtered["Job"].map(role_key).eq("PIS")
-            & filtered["KPIGroup"].eq("准时交付")
-        ]
-        render_rate_module(
-            module_data,
-            selected_module,
-            latest_month,
-            period_label,
-            period_month_labels,
-        )
-    elif selected_module == "IE · SOT PACE 交付准确率":
-        module_data = filtered[
-            filtered["Job"].map(role_key).eq("IE")
-            & filtered["MetricType"].eq("rate")
-        ]
-        render_rate_module(
-            module_data,
-            selected_module,
-            latest_month,
-            period_label,
-            period_month_labels,
-        )
-    elif selected_module == "Modelist · PAP / TF / BOM 一次通过率":
+    elif selected_module == "TP RFT":
         module_data = filtered[
             filtered["Job"].map(role_key).eq("Modelist")
             & filtered["KPIGroup"].eq("RFT")
@@ -693,9 +706,9 @@ with tabs[0]:
             period_label,
             period_month_labels,
         )
-    elif selected_module == "Designer · 3D 交付准确率":
+    elif selected_module == "PPS RFT":
         module_data = filtered[
-            filtered["Job"].map(role_key).eq("Designer")
+            filtered["Job"].map(role_key).eq("IE")
             & filtered["MetricType"].eq("rate")
         ]
         render_rate_module(
@@ -705,7 +718,31 @@ with tabs[0]:
             period_label,
             period_month_labels,
         )
-    elif selected_module == "Overall · 个人目标达成":
+    elif selected_module == "SSS RFT":
+        module_data = filtered[
+            filtered["Job"].map(role_key).eq("PIS")
+            & filtered["KPIGroup"].eq("RFT")
+        ]
+        render_rate_module(
+            module_data,
+            selected_module,
+            latest_month,
+            period_label,
+            period_month_labels,
+        )
+    elif selected_module == "GO PROD on time":
+        module_data = filtered[
+            filtered["Job"].map(role_key).eq("PIS")
+            & filtered["KPI"].str.contains("GO PROD", case=False, na=False)
+        ]
+        render_rate_module(
+            module_data,
+            selected_module,
+            latest_month,
+            period_label,
+            period_month_labels,
+        )
+    elif selected_module == "__unused_overall_attainment__":
         employee_source = filtered[
             filtered["MetricType"].eq("rate") & filtered["Target"].notna()
         ]
@@ -776,9 +813,15 @@ with tabs[0]:
                 config={"displayModeBar": False},
             )
     else:
-        exception = filtered[filtered["MetricType"].eq("count")]
+        st.caption(
+            "当前 Excel 以“未准时提交次数”记录 TP on time；图表展示异常次数及原因。"
+        )
+        exception = filtered[
+            filtered["MetricType"].eq("count")
+            & filtered["Job"].map(role_key).eq("Modelist")
+        ]
         if exception.empty:
-            empty_chart("当前范围没有 RFT 未准时提交数据。")
+            empty_chart("当前范围没有 TP on time 数据。")
         else:
             exception_monthly = (
                 exception.groupby(["Month", "Job", "Name"], as_index=False)
@@ -821,7 +864,7 @@ with tabs[0]:
                 markers=True,
                 custom_data=["JobPlain", "Reason"],
                 color_discrete_map=name_color_map,
-                title="RFT 未准时提交次数趋势（目标：每人每月 ≤ 2 次）",
+                title="TP on time · 未准时提交次数趋势（目标：每人每月 ≤ 2 次）",
                 labels={"Value": "次数", "MonthLabel": "月份", "Name": "员工"},
             )
             fig_exception.update_traces(
