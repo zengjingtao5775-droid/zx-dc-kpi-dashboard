@@ -135,11 +135,11 @@ st.markdown(
         white-space: pre-line !important;
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1),
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2) {
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2),
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3),
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4) {
         border-color: #F2994A !important; background: #FFF3E8 !important; color: #A95108 !important;
       }
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3),
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4),
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5),
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6) {
         border-color: #7B61FF !important; background: #F3F0FF !important; color: #5239C7 !important;
@@ -151,9 +151,9 @@ st.markdown(
         border-color: #54B435 !important; background: #EEF9EA !important; color: #1F7A3D !important;
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1)[kind="pillsActive"],
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2)[kind="pillsActive"] { background: #F2994A !important; color: white !important; }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2)[kind="pillsActive"],
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3)[kind="pillsActive"],
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4)[kind="pillsActive"],
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4)[kind="pillsActive"] { background: #F2994A !important; color: white !important; }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5)[kind="pillsActive"],
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6)[kind="pillsActive"] { background: #7B61FF !important; color: white !important; }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(7)[kind="pillsActive"] { background: #2EA8E5 !important; color: white !important; }
@@ -941,7 +941,11 @@ with tabs[0]:
                 & filtered["KPI"].str.contains("3D", case=False, na=False)
             ]
         if module_name == "TP RFT":
-            return filtered[role.eq("Modelist") & filtered["KPIGroup"].eq("RFT")]
+            return filtered[
+                role.eq("Modelist")
+                & filtered["KPIGroup"].eq("RFT")
+                & filtered["KPI"].str.contains("TP", case=False, na=False)
+            ]
         if module_name == "TP ON TIME":
             rate_rows = filtered[
                 role.eq("Modelist")
@@ -966,9 +970,10 @@ with tabs[0]:
                 & filtered["KPIGroup"].eq(kpi_group)
             ]
         family = "MARKER" if module_name.startswith("MARKER") else "SOT"
+        owner_role = "Modelist" if family == "MARKER" else "ME"
         kpi_group = "RFT" if module_name.endswith("RFT") else "准时交付"
         return filtered[
-            role.eq("ME")
+            role.eq(owner_role)
             & filtered["KPI"].str.contains(family, case=False, na=False)
             & filtered["KPIGroup"].eq(kpi_group)
         ]
@@ -1069,14 +1074,18 @@ with tabs[0]:
             period_label,
             period_month_labels,
         )
-    elif selected_module in {"MARKER RFT", "MARKER ON TIME", "SOT RFT", "SOT ON TIME"}:
-        family = "MARKER" if selected_module.startswith("MARKER") else "SOT"
-        kpi_group = "RFT" if selected_module.endswith("RFT") else "准时交付"
-        module_data = filtered[
-            filtered["Job"].map(role_key).eq("ME")
-            & filtered["KPI"].str.contains(family, case=False, na=False)
-            & filtered["KPIGroup"].eq(kpi_group)
-        ]
+    elif selected_module in {"MARKER RFT", "MARKER ON TIME"}:
+        module_data = selected_module_data
+        render_employee_rate_modules(
+            module_data,
+            module_labels[selected_module],
+            latest_month,
+            period_label,
+            period_month_labels,
+            modelist_names,
+        )
+    elif selected_module in {"SOT RFT", "SOT ON TIME"}:
+        module_data = selected_module_data
         render_rate_module(
             module_data,
             module_labels[selected_module],
