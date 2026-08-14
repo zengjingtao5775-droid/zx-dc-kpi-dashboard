@@ -54,5 +54,6 @@
 - Browser console warnings/errors: none.
 - Screenshot comparison passed: MARKER RFT and MARKER ON TIME are orange, SOT remains purple, and both MARKER modules show separate Jiao Chen / Mengli Jiang panels.
 - Production refresh verification: passed; the live app loaded the new roster and the 50% TP record after a forced Google refresh.
+- Production MARKER verification: passed; both MARKER cards are orange, both employee panels render independently, and the browser console has no warnings or errors.
 
 final result: passed
