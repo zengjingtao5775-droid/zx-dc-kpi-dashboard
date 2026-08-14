@@ -23,7 +23,7 @@
 - Module buttons should be rectangular boxes in one desktop row, and the explanatory sentence below them should be removed.
 - Filters should not occupy the default first-screen view, but remain available when needed.
 - The dashboard name should use `DC`, with English as the primary language and smaller Chinese support text.
-- Header role order should follow module ownership: Designer, Modelist, PIS, IE.
+- Header role order should follow the confirmed development-file sequence: Modelist, IE, Designer, PIS, then ME.
 - The redundant target card and blank latest-month card should be removed from each focused module.
 - The data-instructions tab should be removed; retain only KPI Dashboard and Performance Detail.
 - A visible Chinese/English switch should replace the mixed-language interface; each mode must use one language consistently.
@@ -31,6 +31,8 @@
 - ME requires four focused modules: MARKER RFT, MARKER ON TIME, SOT RFT, and SOT ON TIME.
 - Period controls must visibly change the selected time window even when some months have no source data.
 - Each KPI module box should show its period result directly so users can read the headline value without opening the trend chart.
+- Role order must follow the development-file handoff sequence: Modelist, IE, Designer, PIS, then ME.
+- TP on-time must be shown as a percentage, not an average late-submission count.
 
 ## Findings
 
@@ -60,6 +62,8 @@ No actionable P0/P1/P2 findings remain.
 - Language QA confirmed that the English interface contains no Chinese text except the `中文` switch label, including the TP on-time exception module; Chinese and English performance-detail views also load successfully.
 - Current Google Sheet verification (2026-08-14) found no ME rows and no PIS KPI containing PPS, so those new modules correctly show an empty-data message instead of borrowing unrelated IE or PIS metrics.
 - Browser interaction QA confirmed Last 12 Months `2025/08–2026/07`, Year to Date `2026/01–2026/07`, and a visible Custom month-range control.
+- Header and role-filter ordering are fixed to the development sequence rather than alphabetical source-row order.
+- TP on-time card compliance is calculated as employee-month records with no more than two late submissions divided by all recorded employee-months; the detailed chart continues to show raw counts and reasons.
 
 ## Comparison history
 

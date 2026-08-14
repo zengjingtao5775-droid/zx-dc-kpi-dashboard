@@ -34,7 +34,7 @@ BLUE = DECATHLON_BLUE
 DESIGNER_BLUE = "#2EA8E5"
 INK = "#12324A"
 MUTED = "#5E7482"
-DATA_SCHEMA_VERSION = 4
+DATA_SCHEMA_VERSION = 5
 
 ROLE_STYLE = {
     "IE": {"zh": "工程", "en": "IE", "color": PINK},
@@ -699,7 +699,16 @@ with st.sidebar:
         f"{start_month:%Y/%m}–{end_month:%Y/%m}"
     )
 
-    job_options = sorted(data["Job"].unique())
+    preferred_job_order = ["Modelist", "IE", "Designer", "PIS", "ME"]
+    job_options = sorted(
+        data["Job"].unique(),
+        key=lambda job: (
+            preferred_job_order.index(role_key(job))
+            if role_key(job) in preferred_job_order
+            else len(preferred_job_order),
+            str(job),
+        ),
+    )
     selected_jobs = st.multiselect(
         tr("职位", "Role"),
         job_options,
@@ -776,7 +785,7 @@ role_counts = (
     .nunique()
     .to_dict()
 )
-role_order = ["Designer", "Modelist", "PIS", "ME", "IE"]
+role_order = ["Modelist", "IE", "Designer", "PIS", "ME"]
 role_summary_parts = []
 for role in role_order:
     count = sum(
@@ -888,8 +897,12 @@ with tabs[0]:
         if not rate_values.empty:
             summary_value = percent(float(rate_values.mean()))
         elif not count_values.empty:
-            count_average = f"{float(count_values.mean()):.1f}".rstrip("0").rstrip(".")
-            summary_value = f"{count_average}{tr('次', ' avg')}"
+            count_rows = option_data.loc[
+                option_data["MetricType"].eq("count") & option_data["Target"].notna()
+            ]
+            summary_value = percent(
+                float(count_rows["Value"].le(count_rows["Target"]).mean())
+            )
         else:
             summary_value = "—"
         module_button_labels[option] = f"{module_labels[option]}\n{summary_value}"
@@ -1053,8 +1066,8 @@ with tabs[0]:
     else:
         st.caption(
             tr(
-                "当前 Excel 以“未准时提交次数”记录 TP 准时提交；图表展示异常次数及原因。",
-                "TP on-time performance is recorded as late-submission counts; the chart shows counts and reasons.",
+                "方框达标率 = 每人每月未准时提交次数 ≤ 2 的记录数 ÷ 全部有记录月份；下方图表展示实际次数及原因。",
+                "Card compliance rate = employee-month records with ≤2 late submissions ÷ all recorded employee-months; the chart shows actual counts and reasons.",
             )
         )
         exception = filtered[

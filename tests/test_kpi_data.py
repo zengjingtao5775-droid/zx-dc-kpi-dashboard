@@ -37,6 +37,7 @@ class KPIDataTests(unittest.TestCase):
         self.assertEqual(classify_kpi("SOT RFT"), ("rate", "RFT"))
         self.assertEqual(classify_kpi("SOT ON TIME"), ("rate", "准时交付"))
         self.assertEqual(target_for_kpi("SOT ON TIME", "rate"), 1.0)
+        self.assertEqual(target_for_kpi("未准时提交的次数", "count"), 2.0)
 
     def test_sample_workbook(self):
         data, info = load_kpi_data(SAMPLE)

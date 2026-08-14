@@ -66,7 +66,7 @@ def target_for_kpi(kpi: str, metric_type: str) -> float | None:
     if metric_type == "reason":
         return None
     if metric_type == "count":
-        return 0.0
+        return 2.0
     if metric_type == "duration":
         return None
     if any(
