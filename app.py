@@ -103,23 +103,20 @@ st.markdown(
       }
       [data-testid="stButtonGroup"] [role="radiogroup"] {
         display: grid !important;
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        gap: 14px !important; width: 100% !important;
+        grid-template-columns: repeat(6, minmax(150px, 1fr)) !important;
+        gap: 10px !important; width: 100% !important;
+        overflow-x: auto !important; padding-bottom: 3px !important;
       }
       [data-testid="stButtonGroup"] [role="radiogroup"] button {
-        width: 100% !important; min-height: 5rem !important;
-        padding: 1rem 1.4rem !important;
-        border-width: 2px !important; border-radius: 14px !important;
-        font-size: 1.25rem !important; font-weight: 700 !important;
+        width: 100% !important; min-height: 4.1rem !important;
+        padding: .78rem .75rem !important;
+        border-width: 2px !important; border-radius: 10px !important;
+        font-size: 1.05rem !important; font-weight: 700 !important;
         justify-content: center !important;
       }
       [data-testid="stButtonGroup"] [role="radiogroup"] button p {
-        font-size: 1.25rem !important; line-height: 1.25 !important;
-      }
-      @media (max-width: 900px) {
-        [data-testid="stButtonGroup"] [role="radiogroup"] {
-          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        }
+        font-size: 1.05rem !important; line-height: 1.2 !important;
+        white-space: nowrap !important;
       }
       [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1) {
         border-color: #2EA8E5 !important; background: #EAF7FF !important; color: #005A9C !important;
