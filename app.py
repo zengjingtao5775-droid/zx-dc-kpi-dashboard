@@ -349,6 +349,91 @@ def build_attention_table(latest: pd.DataFrame) -> pd.DataFrame:
     return display
 
 
+def render_rate_module(
+    module_data: pd.DataFrame,
+    title: str,
+    latest_month: pd.Timestamp,
+    period_label: str,
+    period_month_labels: list[str],
+) -> None:
+    """Render one job-specific KPI module without mixing unrelated roles."""
+    module_data = module_data[
+        module_data["MetricType"].eq("rate")
+    ].copy()
+    if module_data.empty:
+        empty_chart(f"当前筛选范围没有“{title}”数据。")
+        return
+
+    latest_rows = module_data[module_data["Month"].eq(latest_month)]
+    latest_value = (
+        float(latest_rows["Value"].mean()) if not latest_rows.empty else None
+    )
+    period_value = float(module_data["Value"].mean())
+    targets = sorted(module_data["Target"].dropna().unique())
+    target_text = " / ".join(f"{target:.0%}" for target in targets) or "—"
+
+    summary_cols = st.columns(3)
+    summary_cols[0].metric(f"{latest_month:%Y/%m}", percent(latest_value))
+    summary_cols[1].metric(f"期间平均 · {period_label}", percent(period_value))
+    summary_cols[2].metric("目标", target_text)
+
+    module_data["MonthLabel"] = module_data["Month"].dt.strftime("%Y/%m")
+    module_data["JobPlain"] = module_data["Job"].map(job_plain_label)
+    module_data["Series"] = module_data.apply(
+        lambda row: f"{row['KPI']} · {row['Name']}", axis=1
+    )
+    fig = px.line(
+        module_data,
+        x="MonthLabel",
+        y="Value",
+        color="Series",
+        markers=True,
+        custom_data=["JobPlain", "Name", "KPI", "Target"],
+        color_discrete_sequence=px.colors.qualitative.Safe,
+        title=f"{title} · {period_label}",
+        labels={
+            "Value": "达成率",
+            "MonthLabel": "月份",
+            "Series": "KPI / 员工",
+        },
+    )
+    fig.update_traces(
+        line=dict(width=3),
+        marker=dict(size=8),
+        hovertemplate=(
+            "<b>KPI：%{customdata[2]}</b><br>"
+            "职位：%{customdata[0]}<br>"
+            "员工：%{customdata[1]}<br>"
+            "月份：%{x}<br>"
+            "达成率：%{y:.1%}<br>"
+            "目标：%{customdata[3]:.0%}<extra></extra>"
+        ),
+    )
+    for target in targets:
+        fig.add_hline(
+            y=float(target),
+            line_dash="dash",
+            line_color=INK,
+            opacity=0.55,
+            annotation_text=f"目标 {target:.0%}",
+            annotation_position="top left",
+        )
+    fig.update_xaxes(
+        type="category",
+        categoryorder="array",
+        categoryarray=period_month_labels,
+    )
+    max_value = float(module_data["Value"].max())
+    fig.update_yaxes(
+        tickformat=".0%",
+        range=[0.5, max(1.04, max_value * 1.04)],
+    )
+    st.plotly_chart(
+        format_axis(fig, 430),
+        config={"displayModeBar": False},
+    )
+
+
 with st.sidebar:
     st.markdown("## 数据控制台")
     data_source = st.radio(
@@ -535,15 +620,243 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-metric_cols = st.columns(4)
-metric_cols[0].metric("RFT 一次通过率", percent(rft_value), rft_delta)
-metric_cols[1].metric("RFT 准时交付率", percent(ontime_value))
-metric_cols[2].metric("KPI 达标率", percent(target_achievement))
-metric_cols[3].metric("RFT 未准时提交次数", f"{overdue_value:g}")
-
-tabs = st.tabs(["管理总览", "岗位专项", "绩效明细", "数据说明"])
+tabs = st.tabs(["KPI 模块", "绩效明细", "数据说明"])
 
 with tabs[0]:
+    module_options = [
+        "PIS · RFT 通过率",
+        "PIS · GO PROD / 开发准时率",
+        "IE · SOT PACE 交付准确率",
+        "Modelist · PAP / TF / BOM 一次通过率",
+        "Designer · 3D 交付准确率",
+        "Overall · 个人目标达成",
+        "RFT · 未准时提交",
+    ]
+    selected_module = st.pills(
+        "选择 KPI 模块（点击后仅显示该模块）",
+        module_options,
+        default=module_options[0],
+        selection_mode="single",
+        key="selected_kpi_module",
+    ) or module_options[0]
+
+    st.markdown(
+        '<div class="section-note">一次只查看一个 KPI 模块；模块之间不再混合展示。</div>',
+        unsafe_allow_html=True,
+    )
+
+    if selected_module == "PIS · RFT 通过率":
+        module_data = filtered[
+            filtered["Job"].map(role_key).eq("PIS")
+            & filtered["KPIGroup"].eq("RFT")
+        ]
+        render_rate_module(
+            module_data,
+            selected_module,
+            latest_month,
+            period_label,
+            period_month_labels,
+        )
+    elif selected_module == "PIS · GO PROD / 开发准时率":
+        module_data = filtered[
+            filtered["Job"].map(role_key).eq("PIS")
+            & filtered["KPIGroup"].eq("准时交付")
+        ]
+        render_rate_module(
+            module_data,
+            selected_module,
+            latest_month,
+            period_label,
+            period_month_labels,
+        )
+    elif selected_module == "IE · SOT PACE 交付准确率":
+        module_data = filtered[
+            filtered["Job"].map(role_key).eq("IE")
+            & filtered["MetricType"].eq("rate")
+        ]
+        render_rate_module(
+            module_data,
+            selected_module,
+            latest_month,
+            period_label,
+            period_month_labels,
+        )
+    elif selected_module == "Modelist · PAP / TF / BOM 一次通过率":
+        module_data = filtered[
+            filtered["Job"].map(role_key).eq("Modelist")
+            & filtered["KPIGroup"].eq("RFT")
+        ]
+        render_rate_module(
+            module_data,
+            selected_module,
+            latest_month,
+            period_label,
+            period_month_labels,
+        )
+    elif selected_module == "Designer · 3D 交付准确率":
+        module_data = filtered[
+            filtered["Job"].map(role_key).eq("Designer")
+            & filtered["MetricType"].eq("rate")
+        ]
+        render_rate_module(
+            module_data,
+            selected_module,
+            latest_month,
+            period_label,
+            period_month_labels,
+        )
+    elif selected_module == "Overall · 个人目标达成":
+        employee_source = filtered[
+            filtered["MetricType"].eq("rate") & filtered["Target"].notna()
+        ]
+        if employee_source.empty:
+            empty_chart("当前范围没有带目标值的比率类 KPI。")
+        else:
+            employee = (
+                employee_source
+                .assign(
+                    Attainment=lambda frame: (
+                        frame["Value"] / frame["Target"].replace(0, pd.NA)
+                    ).clip(upper=1.0)
+                )
+                .groupby(["Job", "Name"], as_index=False)
+                .agg(
+                    Attainment=("Attainment", "mean"),
+                    AverageRate=("Value", "mean"),
+                    Months=("Month", "nunique"),
+                )
+                .sort_values("Attainment")
+            )
+            employee["Status"] = employee["Attainment"].ge(1).map(
+                {True: "达标", False: "需关注"}
+            )
+            employee["JobLabel"] = employee["Job"].map(job_legend_label)
+            employee["JobPlain"] = employee["Job"].map(job_plain_label)
+            st.caption("目标达成指数最高显示为 100%；超额完成不再拉高综合指数。")
+            fig_employee = px.bar(
+                employee,
+                x="Attainment",
+                y="Name",
+                color="JobLabel",
+                orientation="h",
+                text=employee["Attainment"].map(lambda value: f"{value:.0%}"),
+                custom_data=["JobPlain", "Months", "AverageRate", "Status"],
+                color_discrete_map=job_color_map(employee["Job"]),
+                title=f"个人目标达成指数 · {period_label}",
+                labels={
+                    "Attainment": "目标达成指数",
+                    "Name": "员工",
+                    "JobLabel": "职位",
+                },
+            )
+            fig_employee.update_traces(
+                hovertemplate=(
+                    "<b>员工：%{y}</b><br>"
+                    "职位：%{customdata[0]}<br>"
+                    "有数据月份：%{customdata[1]}<br>"
+                    "期间平均达成率：%{customdata[2]:.1%}<br>"
+                    "目标达成指数（封顶）：%{x:.1%}<br>"
+                    "状态：%{customdata[3]}<extra></extra>"
+                ),
+                textposition="inside",
+                insidetextanchor="middle",
+                cliponaxis=False,
+                textfont=dict(color="white", size=12),
+            )
+            fig_employee.add_vline(
+                x=1,
+                line_dash="dash",
+                line_color=INK,
+                annotation_text="目标线 100%",
+                annotation_position="top",
+            )
+            fig_employee.update_xaxes(tickformat=".0%", range=[0, 1.08])
+            st.plotly_chart(
+                format_axis(fig_employee, 430),
+                config={"displayModeBar": False},
+            )
+    else:
+        exception = filtered[filtered["MetricType"].eq("count")]
+        if exception.empty:
+            empty_chart("当前范围没有 RFT 未准时提交数据。")
+        else:
+            exception_monthly = (
+                exception.groupby(["Month", "Job", "Name"], as_index=False)
+                .agg(Value=("Value", "sum"))
+                .sort_values("Month")
+            )
+            reason_monthly = (
+                filtered[
+                    filtered["MetricType"].eq("reason")
+                    & filtered["Reason"].ne("")
+                ]
+                .groupby(["Month", "Job", "Name"], as_index=False)
+                .agg(Reason=("Reason", "；".join))
+            )
+            exception_monthly = exception_monthly.merge(
+                reason_monthly, on=["Month", "Job", "Name"], how="left"
+            )
+            exception_monthly["MonthLabel"] = exception_monthly[
+                "Month"
+            ].dt.strftime("%Y/%m")
+            exception_monthly["Reason"] = exception_monthly["Reason"].fillna(
+                "未填写"
+            )
+            exception_monthly["JobPlain"] = exception_monthly["Job"].map(
+                job_plain_label
+            )
+            name_color_map = (
+                exception_monthly.drop_duplicates("Name")
+                .set_index("Name")["Job"]
+                .map(job_color)
+                .to_dict()
+            )
+            fig_exception = px.line(
+                exception_monthly,
+                x="MonthLabel",
+                y="Value",
+                color="Name",
+                line_dash="Name",
+                symbol="Name",
+                markers=True,
+                custom_data=["JobPlain", "Reason"],
+                color_discrete_map=name_color_map,
+                title="RFT 未准时提交次数趋势（目标：每人每月 ≤ 2 次）",
+                labels={"Value": "次数", "MonthLabel": "月份", "Name": "员工"},
+            )
+            fig_exception.update_traces(
+                line=dict(width=3),
+                marker=dict(size=9),
+                hovertemplate=(
+                    "<b>员工：%{fullData.name}</b><br>"
+                    "职位：%{customdata[0]}<br>"
+                    "月份：%{x}<br>"
+                    "未准时提交：%{y:.0f} 次<br>"
+                    "原因：%{customdata[1]}<extra></extra>"
+                ),
+            )
+            fig_exception.add_hline(
+                y=2,
+                line_dash="dash",
+                line_color=RED,
+                annotation_text="目标红线：≤2次/月",
+                annotation_position="top left",
+            )
+            fig_exception.update_xaxes(
+                type="category",
+                categoryorder="array",
+                categoryarray=period_month_labels,
+            )
+            fig_exception.update_yaxes(
+                dtick=1,
+                range=[0, max(3, float(exception_monthly["Value"].max()) + 0.8)],
+            )
+            st.plotly_chart(
+                format_axis(fig_exception, 430),
+                config={"displayModeBar": False},
+            )
+
+if False:
     employee_source = filtered[
         filtered["MetricType"].eq("rate") & filtered["Target"].notna()
     ]
@@ -710,7 +1023,7 @@ with tabs[0]:
             height=min(420, 38 * (len(attention_table) + 1)),
         )
 
-with tabs[1]:
+if False:
     modelist_col, designer_col = st.columns([1.25, 0.75])
 
     with modelist_col:
@@ -876,7 +1189,7 @@ with tabs[1]:
             icon="⏱️",
         )
 
-with tabs[2]:
+with tabs[1]:
     st.markdown(f"### 工作表2原始月度数据 · {period_label}")
     st.caption(
         "每个 KPI 保留为独立行；比率、次数和原因不会混在一起。"
@@ -988,7 +1301,7 @@ with tabs[2]:
             hide_index=True,
         )
 
-with tabs[3]:
+with tabs[2]:
     st.markdown("### Excel 更新规则")
     st.markdown(
         """
