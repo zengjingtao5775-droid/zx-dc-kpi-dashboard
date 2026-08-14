@@ -132,7 +132,7 @@ st.markdown(
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button p {
         font-size: .82rem !important; line-height: 1.18 !important;
-        white-space: normal !important;
+        white-space: pre-line !important;
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1) {
         border-color: #2EA8E5 !important; background: #EAF7FF !important; color: #005A9C !important;
@@ -549,6 +549,15 @@ def render_rate_module(
             f"{tr('目标', 'Target')}：%{{customdata[3]:.0%}}<extra></extra>"
         ),
     )
+    fig.add_trace(
+        go.Scatter(
+            x=period_month_labels,
+            y=[None] * len(period_month_labels),
+            mode="lines",
+            showlegend=False,
+            hoverinfo="skip",
+        )
+    )
     for target in targets:
         fig.add_hline(
             y=float(target),
@@ -685,6 +694,11 @@ with st.sidebar:
         start_month = pd.to_datetime(start_label, format="%Y/%m")
         end_month = pd.to_datetime(end_label, format="%Y/%m")
 
+    st.caption(
+        f"{tr('当前选择', 'Selected')}: "
+        f"{start_month:%Y/%m}–{end_month:%Y/%m}"
+    )
+
     job_options = sorted(data["Job"].unique())
     selected_jobs = st.multiselect(
         tr("职位", "Role"),
@@ -713,15 +727,16 @@ if filtered.empty:
     st.stop()
 
 latest_month = filtered["Month"].max()
-period_start = filtered["Month"].min()
-period_end = filtered["Month"].max()
+period_start = pd.Timestamp(start_month).to_period("M").to_timestamp()
+period_end = pd.Timestamp(end_month).to_period("M").to_timestamp()
 period_label = (
     f"{period_start:%Y/%m}"
     if period_start == period_end
     else f"{period_start:%Y/%m}–{period_end:%Y/%m}"
 )
 period_month_labels = [
-    month.strftime("%Y/%m") for month in sorted(filtered["Month"].drop_duplicates())
+    month.strftime("%Y/%m")
+    for month in pd.date_range(period_start, period_end, freq="MS")
 ]
 previous_months = sorted(filtered.loc[filtered["Month"] < latest_month, "Month"].unique())
 previous_month = previous_months[-1] if previous_months else None
@@ -814,6 +829,45 @@ with tabs[0]:
         "SOT RFT",
         "SOT ON TIME",
     ]
+
+    def module_data_for(module_name: str) -> pd.DataFrame:
+        role = filtered["Job"].map(role_key)
+        if module_name == "3D RFT":
+            return filtered[
+                role.eq("Designer")
+                & filtered["KPI"].str.contains("3D", case=False, na=False)
+            ]
+        if module_name == "TP RFT":
+            return filtered[role.eq("Modelist") & filtered["KPIGroup"].eq("RFT")]
+        if module_name == "TP on time":
+            return filtered[
+                role.eq("Modelist") & filtered["MetricType"].eq("count")
+            ]
+        if module_name == "SSS RFT":
+            return filtered[
+                role.eq("PIS")
+                & filtered["KPI"].str.contains("SSS|样品", case=False, regex=True, na=False)
+                & filtered["KPIGroup"].eq("RFT")
+            ]
+        if module_name == "PPS RFT":
+            return filtered[
+                role.eq("PIS")
+                & filtered["KPI"].str.contains("PPS", case=False, na=False)
+                & filtered["KPIGroup"].eq("RFT")
+            ]
+        if module_name == "GO PROD on time":
+            return filtered[
+                role.eq("PIS")
+                & filtered["KPI"].str.contains("GO PROD", case=False, na=False)
+            ]
+        family = "MARKER" if module_name.startswith("MARKER") else "SOT"
+        kpi_group = "RFT" if module_name.endswith("RFT") else "准时交付"
+        return filtered[
+            role.eq("ME")
+            & filtered["KPI"].str.contains(family, case=False, na=False)
+            & filtered["KPIGroup"].eq(kpi_group)
+        ]
+
     module_labels = {
         "3D RFT": tr("3D 一次通过率", "3D RFT"),
         "TP RFT": tr("TP 一次通过率", "TP RFT"),
@@ -826,12 +880,25 @@ with tabs[0]:
         "SOT RFT": tr("SOT 一次通过率", "SOT RFT"),
         "SOT ON TIME": tr("SOT 准时交付", "SOT ON TIME"),
     }
+    module_button_labels = {}
+    for option in module_options:
+        option_data = module_data_for(option)
+        rate_values = option_data.loc[option_data["MetricType"].eq("rate"), "Value"]
+        count_values = option_data.loc[option_data["MetricType"].eq("count"), "Value"]
+        if not rate_values.empty:
+            summary_value = percent(float(rate_values.mean()))
+        elif not count_values.empty:
+            count_average = f"{float(count_values.mean()):.1f}".rstrip("0").rstrip(".")
+            summary_value = f"{count_average}{tr('次', ' avg')}"
+        else:
+            summary_value = "—"
+        module_button_labels[option] = f"{module_labels[option]}\n{summary_value}"
     if st.session_state.get("selected_kpi_module") not in module_options:
         st.session_state["selected_kpi_module"] = module_options[0]
     selected_module = st.pills(
         tr("选择 KPI 模块", "Select KPI Module"),
         module_options,
-        format_func=lambda value: module_labels[value],
+        format_func=lambda value: module_button_labels[value],
         selection_mode="single",
         key="selected_kpi_module",
     ) or module_options[0]
@@ -1058,6 +1125,15 @@ with tabs[0]:
                     f"{tr('未准时提交次数', 'Late Submissions')}：%{{y:.0f}}<br>"
                     f"{tr('原因', 'Reason')}：%{{customdata[1]}}<extra></extra>"
                 ),
+            )
+            fig_exception.add_trace(
+                go.Scatter(
+                    x=period_month_labels,
+                    y=[None] * len(period_month_labels),
+                    mode="lines",
+                    showlegend=False,
+                    hoverinfo="skip",
+                )
             )
             fig_exception.add_hline(
                 y=2,

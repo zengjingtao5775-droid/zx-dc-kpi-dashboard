@@ -6,6 +6,8 @@
   - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/7868efa7e12c107efbafaefeecc12582.mp4`
   - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/fd03a3fa9722ff2d92fd066742d574f9.mp4`
   - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/03ffa84b257b6799e634d3154ffc06d1.mp4`
+  - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/46104531ec6914bbbfb4d17a5b4c1743.mp4`
+  - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/60a038734a9fd0df0b76779666c340fc.mp4`
 - Local evidence: macOS Speech transcripts, AVFoundation frames, and contact sheets in `/tmp/dashboard-video-three`, `/tmp/dashboard-video-four`, and `/tmp/dashboard-video-five`.
 - Browser viewport and implementation pixels: 1280 × 720 CSS px at 1× density.
 - State: Google 表格自动同步、最近 12 个月、全部职位、全部员工、KPI 模块。
@@ -27,6 +29,8 @@
 - A visible Chinese/English switch should replace the mixed-language interface; each mode must use one language consistently.
 - PPS RFT belongs to PIS and must use the PIS green ownership color.
 - ME requires four focused modules: MARKER RFT, MARKER ON TIME, SOT RFT, and SOT ON TIME.
+- Period controls must visibly change the selected time window even when some months have no source data.
+- Each KPI module box should show its period result directly so users can read the headline value without opening the trend chart.
 
 ## Findings
 
@@ -41,6 +45,8 @@ No actionable P0/P1/P2 findings remain.
 - Header ownership order now matches the module color sequence.
 - The language switch is positioned above the hero panel. Chinese mode localizes navigation, filters, role names, module names, summaries, chart labels, tooltips, and tables; English mode localizes the same surfaces and translates known source KPI names.
 - The KPI row now contains ten boxes in one desktop row. PPS uses PIS green; the four ME boxes use a dedicated purple ownership color and are ready to populate when ME rows are added to the source sheet.
+- Module boxes now show the selected-period average: percentages for rate KPIs, average count for the TP exception KPI, and an em dash when no matching source data exists.
+- Last 12 Months now displays the full 12-month window, Year to Date starts in January, and Custom uses its selected endpoints; missing months remain available on the chart axis.
 
 ## Interaction and runtime checks
 
@@ -53,6 +59,7 @@ No actionable P0/P1/P2 findings remain.
 - Local browser verification confirmed the collapsed filter panel, two-tab navigation, six single-row modules, compact period summary, and removal of the Target card.
 - Language QA confirmed that the English interface contains no Chinese text except the `中文` switch label, including the TP on-time exception module; Chinese and English performance-detail views also load successfully.
 - Current Google Sheet verification (2026-08-14) found no ME rows and no PIS KPI containing PPS, so those new modules correctly show an empty-data message instead of borrowing unrelated IE or PIS metrics.
+- Browser interaction QA confirmed Last 12 Months `2025/08–2026/07`, Year to Date `2026/01–2026/07`, and a visible Custom month-range control.
 
 ## Comparison history
 
