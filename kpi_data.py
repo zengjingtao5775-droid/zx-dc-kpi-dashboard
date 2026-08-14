@@ -8,12 +8,17 @@ import pandas as pd
 
 
 REQUIRED_COLUMNS = ("Job", "Name", "KPI")
+NOT_APPLICABLE_TOKENS = {"NA", "N/A", "不适用"}
 
 
 def _text(value: object) -> str:
     if pd.isna(value):
         return ""
     return str(value).strip()
+
+
+def _is_not_applicable(value: object) -> bool:
+    return _text(value).upper() in NOT_APPLICABLE_TOKENS
 
 
 def parse_month_header(value: object) -> pd.Timestamp | None:
@@ -54,10 +59,10 @@ def classify_kpi(kpi: str) -> tuple[str, str]:
         return "count", "异常次数"
     if any(token in key for token in ("l/t", "leadtime", "周期", "时长", "天数")):
         return "duration", "L/T"
-    if any(token in key for token in ("一次通过", "rft", "bom", "pap", "tf", "3d")):
-        return "rate", "RFT"
     if any(token in key for token in ("ontime", "准时", "准确率", "交付")):
         return "rate", "准时交付"
+    if any(token in key for token in ("一次通过", "rft", "bom", "pap", "tf", "3d")):
+        return "rate", "RFT"
     return "rate", "其他比率"
 
 
@@ -84,14 +89,63 @@ def load_kpi_data(
 ) -> tuple[pd.DataFrame, dict[str, object]]:
     """Read the second worksheet and reshape the wide monthly table to long form."""
     excel = pd.ExcelFile(source, engine="openpyxl")
-    if "工作表2" in excel.sheet_names:
+    dashboard_sheets = [
+        name
+        for name in excel.sheet_names
+        if "database for dashboard" in name.lower()
+    ]
+    if dashboard_sheets:
+        sheet_name = dashboard_sheets[-1]
+    elif "工作表2" in excel.sheet_names:
         sheet_name = "工作表2"
     elif len(excel.sheet_names) >= 2:
         sheet_name = excel.sheet_names[1]
     else:
         sheet_name = excel.sheet_names[0]
 
-    raw = pd.read_excel(excel, sheet_name=sheet_name)
+    preview = pd.read_excel(
+        excel, sheet_name=sheet_name, header=None, keep_default_na=False
+    )
+    first_row_keys = [_text(value).lower() for value in preview.iloc[0, :3]]
+    first_year_value = pd.to_numeric(
+        pd.Series([preview.iat[0, 3]]), errors="coerce"
+    ).iloc[0]
+    first_month_value = pd.to_numeric(
+        pd.Series([preview.iat[1, 3]]), errors="coerce"
+    ).iloc[0]
+    two_row_month_header = (
+        first_row_keys == ["job", "name", "kpi"]
+        and pd.notna(first_year_value)
+        and 1900 <= int(first_year_value) <= 2200
+        and pd.notna(first_month_value)
+        and 1 <= int(first_month_value) <= 12
+    )
+
+    if two_row_month_header:
+        selected_columns = [0, 1, 2]
+        month_headers: list[pd.Timestamp] = []
+        current_year: int | None = None
+        for column_index in range(3, preview.shape[1]):
+            year_value = pd.to_numeric(
+                pd.Series([preview.iat[0, column_index]]), errors="coerce"
+            ).iloc[0]
+            if pd.notna(year_value) and 1900 <= int(year_value) <= 2200:
+                current_year = int(year_value)
+            month_value = pd.to_numeric(
+                pd.Series([preview.iat[1, column_index]]), errors="coerce"
+            ).iloc[0]
+            if current_year is None or pd.isna(month_value):
+                continue
+            month_number = int(month_value)
+            if not 1 <= month_number <= 12:
+                continue
+            selected_columns.append(column_index)
+            month_headers.append(pd.Timestamp(current_year, month_number, 1))
+
+        raw = preview.iloc[2:, selected_columns].copy()
+        raw.columns = ["Job", "Name", "KPI", *month_headers]
+    else:
+        raw = pd.read_excel(excel, sheet_name=sheet_name, keep_default_na=False)
     if raw.shape[1] < 4:
         raise ValueError("数据表至少需要 Job、Name、2级KPI 和一个月份列。")
 
@@ -108,6 +162,12 @@ def load_kpi_data(
     raw["Name"] = raw["Name"].map(_text)
     raw["KPI"] = raw["KPI"].map(_text)
     raw = raw[(raw["Job"] != "") & (raw["Name"] != "") & (raw["KPI"] != "")].copy()
+    roster = (
+        raw[["Job", "Name"]]
+        .drop_duplicates()
+        .sort_values(["Job", "Name"])
+        .to_dict("records")
+    )
 
     month_columns: dict[object, pd.Timestamp] = {}
     for column in raw.columns[3:]:
@@ -125,17 +185,29 @@ def load_kpi_data(
     )
     melted["Month"] = melted["MonthColumn"].map(month_columns)
     melted["Value"] = pd.to_numeric(melted["RawValue"], errors="coerce")
+    not_applicable_mask = melted["RawValue"].map(_is_not_applicable)
+    reporting_months = sorted(
+        melted.loc[melted["RawValue"].map(_text).ne(""), "Month"]
+        .drop_duplicates()
+        .tolist()
+    )
 
     classifications = melted["KPI"].map(classify_kpi)
     melted["MetricType"] = classifications.map(lambda item: item[0])
     melted["KPIGroup"] = classifications.map(lambda item: item[1])
     reason_mask = melted["MetricType"].eq("reason")
-    melted["Reason"] = melted["RawValue"].map(_text).where(reason_mask, "")
+    melted["Reason"] = (
+        melted["RawValue"]
+        .map(_text)
+        .where(reason_mask & ~not_applicable_mask, "")
+    )
 
     invalid_numeric = int(
         (
             ~reason_mask
+            & ~not_applicable_mask
             & melted["RawValue"].notna()
+            & melted["RawValue"].map(_text).ne("")
             & melted["Value"].isna()
         ).sum()
     )
@@ -178,9 +250,12 @@ def load_kpi_data(
         "invalid_numeric": invalid_numeric,
         "duplicate_count": duplicate_count,
         "month_count": melted["Month"].nunique(),
-        "employee_count": melted["Name"].nunique(),
-        "job_count": melted["Job"].nunique(),
+        "employee_count": len({item["Name"] for item in roster}),
+        "job_count": len({item["Job"] for item in roster}),
         "reason_count": int(melted["MetricType"].eq("reason").sum()),
+        "not_applicable_count": int(not_applicable_mask.sum()),
+        "reporting_months": reporting_months,
+        "roster": roster,
     }
     return melted, info
 

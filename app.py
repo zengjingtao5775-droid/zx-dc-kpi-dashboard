@@ -34,7 +34,7 @@ BLUE = DECATHLON_BLUE
 DESIGNER_BLUE = "#2EA8E5"
 INK = "#12324A"
 MUTED = "#5E7482"
-DATA_SCHEMA_VERSION = 5
+DATA_SCHEMA_VERSION = 7
 
 ROLE_STYLE = {
     "IE": {"zh": "工程", "en": "IE", "color": PINK},
@@ -42,7 +42,7 @@ ROLE_STYLE = {
     "Modelist": {"zh": "版师", "en": "Modelist", "color": ORANGE},
     "Designer": {"zh": "设计", "en": "Designer", "color": DESIGNER_BLUE},
     "Design": {"zh": "设计", "en": "Designer", "color": DESIGNER_BLUE},
-    "ME": {"zh": "ME", "en": "ME", "color": ME_PURPLE},
+    "ME": {"zh": "IE", "en": "IE", "color": ME_PURPLE},
 }
 st.set_page_config(
     page_title="ZX DC KPI Dashboard",
@@ -119,9 +119,9 @@ st.markdown(
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] {
         display: grid !important;
-        grid-template-columns: repeat(10, minmax(100px, 1fr)) !important;
-        gap: 6px !important; width: 100% !important;
-        overflow-x: auto !important; padding-bottom: 3px !important;
+        grid-template-columns: repeat(11, minmax(0, 1fr)) !important;
+        gap: 4px !important; width: 100% !important;
+        overflow: visible !important; padding-bottom: 3px !important;
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button {
         width: 100% !important; min-height: 4.1rem !important;
@@ -131,31 +131,33 @@ st.markdown(
         justify-content: center !important;
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button p {
-        font-size: .82rem !important; line-height: 1.18 !important;
+        font-size: .75rem !important; line-height: 1.16 !important;
         white-space: pre-line !important;
       }
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1) {
-        border-color: #2EA8E5 !important; background: #EAF7FF !important; color: #005A9C !important;
-      }
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2),
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3) {
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1),
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2) {
         border-color: #F2994A !important; background: #FFF3E8 !important; color: #A95108 !important;
       }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3),
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4),
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5),
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6) {
-        border-color: #54B435 !important; background: #EEF9EA !important; color: #1F7A3D !important;
-      }
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(n+7) {
         border-color: #7B61FF !important; background: #F3F0FF !important; color: #5239C7 !important;
       }
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1)[kind="pillsActive"] { background: #2EA8E5 !important; color: white !important; }
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2)[kind="pillsActive"],
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3)[kind="pillsActive"] { background: #F2994A !important; color: white !important; }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(7) {
+        border-color: #2EA8E5 !important; background: #EAF7FF !important; color: #005A9C !important;
+      }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(n+8) {
+        border-color: #54B435 !important; background: #EEF9EA !important; color: #1F7A3D !important;
+      }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1)[kind="pillsActive"],
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2)[kind="pillsActive"] { background: #F2994A !important; color: white !important; }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3)[kind="pillsActive"],
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4)[kind="pillsActive"],
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5)[kind="pillsActive"],
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6)[kind="pillsActive"] { background: #54B435 !important; color: white !important; }
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(n+7)[kind="pillsActive"] { background: #7B61FF !important; color: white !important; }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6)[kind="pillsActive"] { background: #7B61FF !important; color: white !important; }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(7)[kind="pillsActive"] { background: #2EA8E5 !important; color: white !important; }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(n+8)[kind="pillsActive"] { background: #54B435 !important; color: white !important; }
       .st-key-ui_language [data-testid="stButtonGroup"] { justify-content: flex-end; }
       .st-key-ui_language button { min-width: 92px; font-weight: 700; }
       .section-note {
@@ -207,6 +209,21 @@ KPI_ENGLISH = {
     "未准时提交的次数": "Late Submission Count",
     "样品一次通过率": "Sample RFT",
 }
+KPI_CHINESE = {
+    "3D RFT": "3D 一次通过率",
+    "TP BOM RFT": "TP BOM 一次通过率",
+    "TP BOM ON TIME": "TP BOM 准时交付",
+    "TP PAP RFT": "TP PAP 一次通过率",
+    "TP PAP ON TIME": "TP PAP 准时交付",
+    "Marker RFT": "MARKER 一次通过率",
+    "Marker ON TIME": "MARKER 准时交付",
+    "SOT RFT": "SOT 一次通过率",
+    "SOT ON TIME": "SOT 准时交付",
+    "SSS RFT": "SSS 一次通过率",
+    "SSS ON TIME": "SSS 准时交付",
+    "PPS RFT": "PPS 一次通过率",
+    "PPS ON TIME": "PPS 准时交付",
+}
 KPI_GROUP_ENGLISH = {
     "准时交付": "On-time Delivery",
     "异常次数": "Exception Count",
@@ -216,7 +233,7 @@ KPI_GROUP_ENGLISH = {
 
 def display_kpi(value: object) -> str:
     text = str(value)
-    return text if IS_ZH else KPI_ENGLISH.get(text, text)
+    return KPI_CHINESE.get(text, text) if IS_ZH else KPI_ENGLISH.get(text, text)
 
 
 def display_kpi_group(value: object) -> str:
@@ -583,6 +600,48 @@ def render_rate_module(
     )
 
 
+def render_employee_rate_modules(
+    module_data: pd.DataFrame,
+    title: str,
+    latest_month: pd.Timestamp,
+    period_label: str,
+    period_month_labels: list[str],
+) -> None:
+    """Keep each employee's TP trend separate so overlapping lines stay readable."""
+    rate_data = module_data[module_data["MetricType"].eq("rate")].copy()
+    if rate_data.empty:
+        render_rate_module(
+            module_data,
+            title,
+            latest_month,
+            period_label,
+            period_month_labels,
+        )
+        return
+
+    names = sorted(rate_data["Name"].dropna().unique())
+    if len(names) <= 1:
+        render_rate_module(
+            rate_data,
+            title,
+            latest_month,
+            period_label,
+            period_month_labels,
+        )
+        return
+
+    columns = st.columns(2)
+    for index, name in enumerate(names):
+        with columns[index % 2]:
+            render_rate_module(
+                rate_data[rate_data["Name"].eq(name)],
+                f"{title} · {name}",
+                latest_month,
+                period_label,
+                period_month_labels,
+            )
+
+
 with st.sidebar:
     st.markdown(f"## {tr('数据与筛选', 'Data & Filters')}")
     data_source = st.radio(
@@ -657,8 +716,14 @@ with st.sidebar:
     else:
         st.info(tr("当前数据源：", "Current source: ") + str(source_info["source_label"]))
 
-all_months = sorted(data["Month"].drop_duplicates().tolist())
+all_months = sorted(
+    set(data["Month"].drop_duplicates().tolist())
+    | set(source_info.get("reporting_months", []))
+)
 latest_available = max(all_months)
+roster = pd.DataFrame(source_info.get("roster", []))
+if roster.empty:
+    roster = data[["Job", "Name"]].drop_duplicates().copy()
 
 with st.sidebar:
     st.divider()
@@ -699,9 +764,9 @@ with st.sidebar:
         f"{start_month:%Y/%m}–{end_month:%Y/%m}"
     )
 
-    preferred_job_order = ["Modelist", "IE", "Designer", "PIS", "ME"]
+    preferred_job_order = ["Modelist", "ME", "IE", "Designer", "PIS"]
     job_options = sorted(
-        data["Job"].unique(),
+        roster["Job"].unique(),
         key=lambda job: (
             preferred_job_order.index(role_key(job))
             if role_key(job) in preferred_job_order
@@ -715,7 +780,9 @@ with st.sidebar:
         default=job_options,
         format_func=job_plain_label,
     )
-    available_names = sorted(data[data["Job"].isin(selected_jobs)]["Name"].unique())
+    available_names = sorted(
+        roster[roster["Job"].isin(selected_jobs)]["Name"].unique()
+    )
     selected_names = st.multiselect(
         tr("员工", "Employee"), available_names, default=available_names
     )
@@ -779,13 +846,15 @@ rft_delta = (
 )
 
 role_counts = (
-    filtered[["Job", "Name"]]
+    roster[
+        roster["Job"].isin(selected_jobs) & roster["Name"].isin(selected_names)
+    ][["Job", "Name"]]
     .drop_duplicates()
     .groupby("Job")["Name"]
     .nunique()
     .to_dict()
 )
-role_order = ["Modelist", "IE", "Designer", "PIS", "ME"]
+role_order = ["Modelist", "ME", "IE", "Designer", "PIS"]
 role_summary_parts = []
 for role in role_order:
     count = sum(
@@ -827,16 +896,17 @@ tabs = st.tabs(
 
 with tabs[0]:
     module_options = [
-        "3D RFT",
         "TP RFT",
-        "TP on time",
-        "SSS RFT",
-        "PPS RFT",
-        "GO PROD on time",
+        "TP ON TIME",
         "MARKER RFT",
         "MARKER ON TIME",
         "SOT RFT",
         "SOT ON TIME",
+        "3D RFT",
+        "SSS RFT",
+        "SSS ON TIME",
+        "PPS RFT",
+        "PPS ON TIME",
     ]
 
     def module_data_for(module_name: str) -> pd.DataFrame:
@@ -848,26 +918,28 @@ with tabs[0]:
             ]
         if module_name == "TP RFT":
             return filtered[role.eq("Modelist") & filtered["KPIGroup"].eq("RFT")]
-        if module_name == "TP on time":
-            return filtered[
-                role.eq("Modelist") & filtered["MetricType"].eq("count")
+        if module_name == "TP ON TIME":
+            rate_rows = filtered[
+                role.eq("Modelist")
+                & filtered["KPIGroup"].eq("准时交付")
+                & filtered["KPI"].str.contains("TP", case=False, na=False)
             ]
-        if module_name == "SSS RFT":
+            if not rate_rows.empty:
+                return rate_rows
+            return filtered[role.eq("Modelist") & filtered["MetricType"].eq("count")]
+        if module_name in {"SSS RFT", "SSS ON TIME"}:
+            kpi_group = "RFT" if module_name.endswith("RFT") else "准时交付"
             return filtered[
                 role.eq("PIS")
                 & filtered["KPI"].str.contains("SSS|样品", case=False, regex=True, na=False)
-                & filtered["KPIGroup"].eq("RFT")
+                & filtered["KPIGroup"].eq(kpi_group)
             ]
-        if module_name == "PPS RFT":
+        if module_name in {"PPS RFT", "PPS ON TIME"}:
+            kpi_group = "RFT" if module_name.endswith("RFT") else "准时交付"
             return filtered[
                 role.eq("PIS")
                 & filtered["KPI"].str.contains("PPS", case=False, na=False)
-                & filtered["KPIGroup"].eq("RFT")
-            ]
-        if module_name == "GO PROD on time":
-            return filtered[
-                role.eq("PIS")
-                & filtered["KPI"].str.contains("GO PROD", case=False, na=False)
+                & filtered["KPIGroup"].eq(kpi_group)
             ]
         family = "MARKER" if module_name.startswith("MARKER") else "SOT"
         kpi_group = "RFT" if module_name.endswith("RFT") else "准时交付"
@@ -880,10 +952,11 @@ with tabs[0]:
     module_labels = {
         "3D RFT": tr("3D 一次通过率", "3D RFT"),
         "TP RFT": tr("TP 一次通过率", "TP RFT"),
-        "TP on time": tr("TP 准时提交", "TP on time"),
+        "TP ON TIME": tr("TP 准时交付", "TP ON TIME"),
         "SSS RFT": tr("SSS 一次通过率", "SSS RFT"),
+        "SSS ON TIME": tr("SSS 准时交付", "SSS ON TIME"),
         "PPS RFT": tr("PPS 一次通过率", "PPS RFT"),
-        "GO PROD on time": tr("GO PROD 准时交付", "GO PROD on time"),
+        "PPS ON TIME": tr("PPS 准时交付", "PPS ON TIME"),
         "MARKER RFT": tr("MARKER 一次通过率", "MARKER RFT"),
         "MARKER ON TIME": tr("MARKER 准时交付", "MARKER ON TIME"),
         "SOT RFT": tr("SOT 一次通过率", "SOT RFT"),
@@ -915,6 +988,7 @@ with tabs[0]:
         selection_mode="single",
         key="selected_kpi_module",
     ) or module_options[0]
+    selected_module_data = module_data_for(selected_module)
 
     if selected_module == "3D RFT":
         module_data = filtered[
@@ -929,10 +1003,30 @@ with tabs[0]:
             period_month_labels,
         )
     elif selected_module == "TP RFT":
-        module_data = filtered[
-            filtered["Job"].map(role_key).eq("Modelist")
-            & filtered["KPIGroup"].eq("RFT")
-        ]
+        module_data = selected_module_data
+        render_employee_rate_modules(
+            module_data,
+            module_labels[selected_module],
+            latest_month,
+            period_label,
+            period_month_labels,
+        )
+    elif (
+        selected_module == "TP ON TIME"
+        and not selected_module_data.loc[
+            selected_module_data["MetricType"].eq("rate")
+        ].empty
+    ):
+        module_data = selected_module_data
+        render_employee_rate_modules(
+            module_data,
+            module_labels[selected_module],
+            latest_month,
+            period_label,
+            period_month_labels,
+        )
+    elif selected_module in {"PPS RFT", "PPS ON TIME"}:
+        module_data = selected_module_data
         render_rate_module(
             module_data,
             module_labels[selected_module],
@@ -940,37 +1034,8 @@ with tabs[0]:
             period_label,
             period_month_labels,
         )
-    elif selected_module == "PPS RFT":
-        module_data = filtered[
-            filtered["Job"].map(role_key).eq("PIS")
-            & filtered["KPI"].str.contains("PPS", case=False, na=False)
-            & filtered["KPIGroup"].eq("RFT")
-        ]
-        render_rate_module(
-            module_data,
-            module_labels[selected_module],
-            latest_month,
-            period_label,
-            period_month_labels,
-        )
-    elif selected_module == "SSS RFT":
-        module_data = filtered[
-            filtered["Job"].map(role_key).eq("PIS")
-            & filtered["KPI"].str.contains("SSS|样品", case=False, regex=True, na=False)
-            & filtered["KPIGroup"].eq("RFT")
-        ]
-        render_rate_module(
-            module_data,
-            module_labels[selected_module],
-            latest_month,
-            period_label,
-            period_month_labels,
-        )
-    elif selected_module == "GO PROD on time":
-        module_data = filtered[
-            filtered["Job"].map(role_key).eq("PIS")
-            & filtered["KPI"].str.contains("GO PROD", case=False, na=False)
-        ]
+    elif selected_module in {"SSS RFT", "SSS ON TIME"}:
+        module_data = selected_module_data
         render_rate_module(
             module_data,
             module_labels[selected_module],
