@@ -41,9 +41,6 @@ ROLE_STYLE = {
     "Designer": {"zh": "设计", "color": DECATHLON_BLUE},
     "Design": {"zh": "设计", "color": DECATHLON_BLUE},
 }
-TEAM_LABEL = "Team Total<br><sup>团队整体</sup>"
-
-
 st.set_page_config(
     page_title="ZX R&D KPI Dashboard",
     page_icon="📊",
@@ -87,7 +84,11 @@ st.markdown(
         box-shadow: 0 12px 28px rgba(0,90,156,.18);
       }
       .dashboard-title { font-size: 2.15rem; font-weight: 750; color: #FFFFFF; }
-      .dashboard-subtitle { color: #E5F6FF; margin-top: 3px; }
+      .dashboard-subtitle {
+        color: #E5F6FF; margin-top: 5px; line-height: 1.55;
+        overflow-wrap: anywhere;
+      }
+      .team-structure { font-size: .93rem; opacity: .96; }
       .section-note {
         background: #EAF7FF; border-left: 4px solid #0082C3; border-radius: 8px;
         padding: 11px 14px; color: #164B68; margin: 6px 0 14px;
@@ -503,100 +504,46 @@ rft_delta = (
     else None
 )
 
+role_counts = (
+    filtered[["Job", "Name"]]
+    .drop_duplicates()
+    .groupby("Job")["Name"]
+    .nunique()
+    .to_dict()
+)
+role_order = ["IE", "Modelist", "Designer", "PIS"]
+role_summary_parts = []
+for role in role_order:
+    count = sum(
+        value for job, value in role_counts.items() if role_key(job) == role
+    )
+    if count:
+        role_summary_parts.append(f"{role} {count}人")
+for job, count in role_counts.items():
+    if role_key(job) not in role_order:
+        role_summary_parts.append(f"{role_key(job)} {count}人")
+role_summary = " / ".join(role_summary_parts)
+
 st.markdown(
     f"""
-    <div class="hero-panel">
+      <div class="hero-panel">
       <div class="dashboard-title">ZX R&amp;D KPI Dashboard</div>
-      <div class="dashboard-subtitle">研发团队绩效监控 · 数据截止 {latest_month:%Y年%m月} ·
-      {len(selected_jobs)} 个职位 / {filtered["Name"].nunique()} 名员工</div>
+      <div class="dashboard-subtitle">研发团队绩效监控 · 数据截止 {latest_month:%Y年%m月}<br>
+      <span class="team-structure">团队人员：{role_summary}</span></div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-metric_cols = st.columns(5)
+metric_cols = st.columns(4)
 metric_cols[0].metric("RFT 一次通过率", percent(rft_value), rft_delta)
-metric_cols[1].metric("准时交付率", percent(ontime_value))
+metric_cols[1].metric("RFT 准时交付率", percent(ontime_value))
 metric_cols[2].metric("KPI 达标率", percent(target_achievement))
-metric_cols[3].metric("未准时提交次数", f"{overdue_value:g}")
-metric_cols[4].metric("在册员工", f"{filtered['Name'].nunique()} 人")
+metric_cols[3].metric("RFT 未准时提交次数", f"{overdue_value:g}")
 
 tabs = st.tabs(["管理总览", "岗位专项", "绩效明细", "数据说明"])
 
 with tabs[0]:
-    st.markdown("### 团队 KPI 趋势")
-    st.markdown(
-        '<div class="section-note">比率类指标按月取平均；当前 Excel 没有分子/分母明细，因此团队汇总采用等权平均。</div>',
-        unsafe_allow_html=True,
-    )
-
-    trend = (
-        filtered[filtered["MetricType"].eq("rate")]
-        .groupby(["Month", "Job"], as_index=False)
-        .agg(Value=("Value", "mean"))
-    )
-    trend["MonthLabel"] = trend["Month"].dt.strftime("%Y/%m")
-    trend["JobLabel"] = trend["Job"].map(job_legend_label)
-    trend["JobPlain"] = trend["Job"].map(job_plain_label)
-    overall = (
-        filtered[filtered["MetricType"].eq("rate")]
-        .groupby("Month", as_index=False)
-        .agg(Value=("Value", "mean"))
-    )
-    overall["MonthLabel"] = overall["Month"].dt.strftime("%Y/%m")
-    fig_trend = px.line(
-        trend,
-        x="MonthLabel",
-        y="Value",
-        color="JobLabel",
-        line_dash="JobLabel",
-        symbol="JobLabel",
-        markers=True,
-        custom_data=["JobPlain"],
-        color_discrete_map=job_color_map(trend["Job"]),
-        labels={"Value": "平均达成率", "MonthLabel": "月份", "JobLabel": "职位"},
-        title="各职位比率类 KPI 月度表现",
-    )
-    fig_trend.update_traces(
-        line=dict(width=3),
-        marker=dict(size=8),
-        hovertemplate=(
-            "<b>职位：%{customdata[0]}</b><br>"
-            "月份：%{x}<br>"
-            "平均达成率：%{y:.1%}<extra></extra>"
-        ),
-    )
-    fig_trend.add_trace(
-        go.Scatter(
-            x=overall["MonthLabel"],
-            y=overall["Value"],
-            name=TEAM_LABEL,
-            mode="lines+markers",
-            line=dict(color=INK, width=4, dash="dot"),
-            marker=dict(size=9, symbol="diamond"),
-            hovertemplate=(
-                "<b>团队整体</b><br>"
-                "月份：%{x}<br>"
-                "平均达成率：%{y:.1%}<extra></extra>"
-            ),
-        )
-    )
-    fig_trend.update_xaxes(
-        type="category",
-        categoryorder="array",
-        categoryarray=period_month_labels,
-    )
-    fig_trend.update_yaxes(
-        tickformat=".0%",
-        tick0=0.5,
-        dtick=0.1,
-        range=[0.5, max(1.02, trend["Value"].max() * 1.02)],
-    )
-    st.plotly_chart(
-        format_axis(fig_trend, 460),
-        config={"displayModeBar": False},
-    )
-
     employee_source = filtered[
         filtered["MetricType"].eq("rate") & filtered["Target"].notna()
     ]
@@ -606,8 +553,9 @@ with tabs[0]:
         employee = (
             employee_source
             .assign(
-                Attainment=lambda frame: frame["Value"]
-                / frame["Target"].replace(0, pd.NA)
+                Attainment=lambda frame: (
+                    frame["Value"] / frame["Target"].replace(0, pd.NA)
+                ).clip(upper=1.0)
             )
             .groupby(["Job", "Name"], as_index=False)
             .agg(
@@ -622,8 +570,8 @@ with tabs[0]:
         )
         employee["JobLabel"] = employee["Job"].map(job_legend_label)
         employee["JobPlain"] = employee["Job"].map(job_plain_label)
-        attainment_max = employee["Attainment"].dropna().max()
-        attainment_range_max = max(1.12, float(attainment_max) * 1.12)
+        attainment_range_max = 1.08
+        st.caption("目标达成指数最高显示为 100%；超额完成不再拉高综合指数。")
         fig_employee = px.bar(
             employee,
             x="Attainment",
@@ -649,7 +597,7 @@ with tabs[0]:
                 "职位：%{customdata[0]}<br>"
                 "有数据月份：%{customdata[1]}<br>"
                 "期间平均达成率：%{customdata[2]:.1%}<br>"
-                "目标达成指数：%{x:.1%}<br>"
+                "目标达成指数（封顶）：%{x:.1%}<br>"
                 "状态：%{customdata[3]}<extra></extra>"
             )
         )
@@ -672,7 +620,7 @@ with tabs[0]:
             config={"displayModeBar": False},
         )
 
-    st.markdown("### 未准时提交趋势")
+    st.markdown("### RFT 趋势")
     exception = filtered[filtered["MetricType"].eq("count")]
     if not exception.empty:
         exception_monthly = (
@@ -711,7 +659,7 @@ with tabs[0]:
             markers=True,
             custom_data=["JobPlain", "Reason"],
             color_discrete_map=name_color_map,
-            title="未准时提交次数趋势（目标：每人每月 ≤ 2 次）",
+            title="RFT 未准时提交次数趋势（目标：每人每月 ≤ 2 次）",
             labels={"Value": "次数", "MonthLabel": "月份", "Name": "员工"},
         )
         fig_exception.update_traces(
