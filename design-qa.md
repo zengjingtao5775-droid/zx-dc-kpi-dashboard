@@ -24,6 +24,7 @@
 - Header role order should follow module ownership: Designer, Modelist, PIS, IE.
 - The redundant target card and blank latest-month card should be removed from each focused module.
 - The data-instructions tab should be removed; retain only KPI Dashboard and Performance Detail.
+- A visible Chinese/English switch should replace the mixed-language interface; each mode must use one language consistently.
 
 ## Findings
 
@@ -36,6 +37,7 @@ No actionable P0/P1/P2 findings remain.
 - Copy and content: the six module names match the requested development order.
 - Ownership colors: Designer/3D is blue, Modelist/TP is orange, PIS/SSS and GO PROD are green, and IE/PPS is pink.
 - Header ownership order now matches the module color sequence.
+- The language switch is positioned above the hero panel. Chinese mode localizes navigation, filters, role names, module names, summaries, chart labels, tooltips, and tables; English mode localizes the same surfaces and translates known source KPI names.
 
 ## Interaction and runtime checks
 
@@ -46,6 +48,7 @@ No actionable P0/P1/P2 findings remain.
 - Browser console warnings/errors: none.
 - Python compilation, four unit tests, and `git diff --check`: passed.
 - Local browser verification confirmed the collapsed filter panel, two-tab navigation, six single-row modules, compact period summary, and removal of the Target card.
+- Language QA confirmed that the English interface contains no Chinese text except the `中文` switch label, including the TP on-time exception module; Chinese and English performance-detail views also load successfully.
 
 ## Comparison history
 

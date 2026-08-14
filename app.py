@@ -36,11 +36,11 @@ MUTED = "#5E7482"
 DATA_SCHEMA_VERSION = 4
 
 ROLE_STYLE = {
-    "IE": {"zh": "工程", "color": PINK},
-    "PIS": {"zh": "产品导入", "color": GREEN},
-    "Modelist": {"zh": "版师", "color": ORANGE},
-    "Designer": {"zh": "设计", "color": DESIGNER_BLUE},
-    "Design": {"zh": "设计", "color": DESIGNER_BLUE},
+    "IE": {"zh": "工程", "en": "IE", "color": PINK},
+    "PIS": {"zh": "产品导入", "en": "PIS", "color": GREEN},
+    "Modelist": {"zh": "版师", "en": "Modelist", "color": ORANGE},
+    "Designer": {"zh": "设计", "en": "Designer", "color": DESIGNER_BLUE},
+    "Design": {"zh": "设计", "en": "Designer", "color": DESIGNER_BLUE},
 }
 st.set_page_config(
     page_title="ZX DC KPI Dashboard",
@@ -112,46 +112,48 @@ st.markdown(
       .st-key-selected_kpi_module {
         width: 100% !important;
       }
-      [data-testid="stButtonGroup"] {
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] {
         display: block !important; width: 100% !important;
       }
-      [data-testid="stButtonGroup"] [role="radiogroup"] {
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] {
         display: grid !important;
         grid-template-columns: repeat(6, minmax(150px, 1fr)) !important;
         gap: 10px !important; width: 100% !important;
         overflow-x: auto !important; padding-bottom: 3px !important;
       }
-      [data-testid="stButtonGroup"] [role="radiogroup"] button {
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button {
         width: 100% !important; min-height: 4.1rem !important;
         padding: .78rem .75rem !important;
         border-width: 2px !important; border-radius: 10px !important;
         font-size: 1.05rem !important; font-weight: 700 !important;
         justify-content: center !important;
       }
-      [data-testid="stButtonGroup"] [role="radiogroup"] button p {
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button p {
         font-size: 1.05rem !important; line-height: 1.2 !important;
         white-space: nowrap !important;
       }
-      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1) {
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1) {
         border-color: #2EA8E5 !important; background: #EAF7FF !important; color: #005A9C !important;
       }
-      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2),
-      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3) {
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2),
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3) {
         border-color: #F2994A !important; background: #FFF3E8 !important; color: #A95108 !important;
       }
-      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4),
-      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6) {
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4),
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6) {
         border-color: #54B435 !important; background: #EEF9EA !important; color: #1F7A3D !important;
       }
-      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5) {
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5) {
         border-color: #F36FB4 !important; background: #FFF0F8 !important; color: #B3367D !important;
       }
-      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1)[kind="pillsActive"] { background: #2EA8E5 !important; color: white !important; }
-      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2)[kind="pillsActive"],
-      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3)[kind="pillsActive"] { background: #F2994A !important; color: white !important; }
-      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4)[kind="pillsActive"],
-      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6)[kind="pillsActive"] { background: #54B435 !important; color: white !important; }
-      [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5)[kind="pillsActive"] { background: #F36FB4 !important; color: white !important; }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1)[kind="pillsActive"] { background: #2EA8E5 !important; color: white !important; }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2)[kind="pillsActive"],
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3)[kind="pillsActive"] { background: #F2994A !important; color: white !important; }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4)[kind="pillsActive"],
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6)[kind="pillsActive"] { background: #54B435 !important; color: white !important; }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5)[kind="pillsActive"] { background: #F36FB4 !important; color: white !important; }
+      .st-key-ui_language [data-testid="stButtonGroup"] { justify-content: flex-end; }
+      .st-key-ui_language button { min-width: 92px; font-weight: 700; }
       .section-note {
         background: #EAF7FF; border-left: 4px solid #0082C3; border-radius: 8px;
         padding: 11px 14px; color: #164B68; margin: 6px 0 14px;
@@ -169,6 +171,53 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+language_space, language_col = st.columns([5, 1.35])
+with language_col:
+    language = st.segmented_control(
+        "Language / 语言",
+        options=["zh", "en"],
+        format_func=lambda value: "中文" if value == "zh" else "English",
+        default="zh",
+        key="ui_language",
+        label_visibility="collapsed",
+        width="stretch",
+    ) or "zh"
+
+IS_ZH = language == "zh"
+
+
+def tr(zh: str, en: str) -> str:
+    return zh if IS_ZH else en
+
+
+KPI_ENGLISH = {
+    "3D 交付产品100%准确": "3D Delivery Accuracy",
+    "BOM 一次通过率": "BOM RFT",
+    "GO PROD ontime": "GO PROD on time",
+    "PAP 一次通过率": "PAP RFT",
+    "SOT PACE中的交付准确率": "SOT PACE Delivery Accuracy",
+    "TF 一次通过率": "TF RFT",
+    "开发准时完成率": "Development On-time Completion Rate",
+    "未准时提交的原因": "Late Submission Reason",
+    "未准时提交的次数": "Late Submission Count",
+    "样品一次通过率": "Sample RFT",
+}
+KPI_GROUP_ENGLISH = {
+    "准时交付": "On-time Delivery",
+    "异常次数": "Exception Count",
+    "未准时原因": "Late Submission Reason",
+}
+
+
+def display_kpi(value: object) -> str:
+    text = str(value)
+    return text if IS_ZH else KPI_ENGLISH.get(text, text)
+
+
+def display_kpi_group(value: object) -> str:
+    text = str(value)
+    return text if IS_ZH else KPI_GROUP_ENGLISH.get(text, text)
 
 
 @st.cache_data(show_spinner=False)
@@ -223,20 +272,23 @@ def role_key(job: object) -> str:
 
 def role_info(job: object) -> dict[str, str]:
     key = role_key(job)
-    return ROLE_STYLE.get(key, {"zh": "职位", "color": DECATHLON_DARK_BLUE})
+    return ROLE_STYLE.get(
+        key,
+        {"zh": "职位", "en": "Role", "color": DECATHLON_DARK_BLUE},
+    )
 
 
 def job_legend_label(job: object) -> str:
     key = role_key(job)
     info = role_info(job)
-    return f"{key}<br><sup>{info['zh']}</sup>"
+    return info["zh"] if IS_ZH else info["en"]
 
 
 def job_plain_label(job: object) -> str:
     key = role_key(job)
     info = role_info(job)
     if key in ROLE_STYLE:
-        return f"{key}（{info['zh']}）"
+        return info["zh"] if IS_ZH else info["en"]
     return str(job)
 
 
@@ -257,6 +309,13 @@ def format_kpi_value(value: float, metric_type: str) -> str:
 
 
 def build_raw_monthly_table(data: pd.DataFrame) -> pd.DataFrame:
+    column_names = {
+        "Job": tr("职位", "Role"),
+        "Name": tr("员工", "Employee"),
+        "KPI": tr("二级KPI", "KPI"),
+        "KPIGroup": tr("KPI分类", "KPI Category"),
+        "MetricType": tr("数据类型", "Data Type"),
+    }
     month_columns = sorted(data["Month"].drop_duplicates())
     display_source = data.copy()
     display_source["DisplayValue"] = display_source.apply(
@@ -280,23 +339,25 @@ def build_raw_monthly_table(data: pd.DataFrame) -> pd.DataFrame:
     )
     table = table.rename(
         columns={
-            "Job": "职位",
-            "Name": "员工",
-            "KPI": "二级KPI",
-            "KPIGroup": "KPI分类",
-            "MetricType": "数据类型",
+            **column_names,
             **{month: month.strftime("%Y/%m") for month in month_columns},
         }
     )
-    table["数据类型"] = table["数据类型"].map(
+    metric_type_column = column_names["MetricType"]
+    job_column = column_names["Job"]
+    kpi_column = column_names["KPI"]
+    group_column = column_names["KPIGroup"]
+    table[metric_type_column] = table[metric_type_column].map(
         {
-            "rate": "比率",
-            "count": "次数",
-            "duration": "周期",
-            "reason": "原因",
+            "rate": tr("比率", "Rate"),
+            "count": tr("次数", "Count"),
+            "duration": tr("周期", "Duration"),
+            "reason": tr("原因", "Reason"),
         }
-    ).fillna(table["数据类型"])
-    table["职位"] = table["职位"].map(job_plain_label)
+    ).fillna(table[metric_type_column])
+    table[job_column] = table[job_column].map(job_plain_label)
+    table[kpi_column] = table[kpi_column].map(display_kpi)
+    table[group_column] = table[group_column].map(display_kpi_group)
     return table
 
 
@@ -424,7 +485,12 @@ def render_rate_module(
         module_data["MetricType"].eq("rate")
     ].copy()
     if module_data.empty:
-        empty_chart(f"当前筛选范围没有“{title}”数据。")
+        empty_chart(
+            tr(
+                f"当前筛选范围没有“{title}”数据。",
+                f'No data is available for "{title}" in the selected range.',
+            )
+        )
         return
 
     period_value = float(module_data["Value"].mean())
@@ -434,14 +500,12 @@ def render_rate_module(
         f"""
         <div class="module-summary">
           <div>
-            <div class="module-summary-label">Selected Period</div>
+            <div class="module-summary-label">{tr("统计周期", "Selected Period")}</div>
             <div>{period_label}</div>
-            <div class="module-summary-zh">当前统计周期</div>
           </div>
           <div style="text-align:right">
-            <div class="module-summary-label">Period Average</div>
+            <div class="module-summary-label">{tr("期间平均", "Period Average")}</div>
             <div class="module-summary-value">{percent(period_value)}</div>
-            <div class="module-summary-zh">期间平均</div>
           </div>
         </div>
         """,
@@ -450,8 +514,9 @@ def render_rate_module(
 
     module_data["MonthLabel"] = module_data["Month"].dt.strftime("%Y/%m")
     module_data["JobPlain"] = module_data["Job"].map(job_plain_label)
+    module_data["DisplayKPI"] = module_data["KPI"].map(display_kpi)
     module_data["Series"] = module_data.apply(
-        lambda row: f"{row['KPI']} · {row['Name']}", axis=1
+        lambda row: f"{row['DisplayKPI']} · {row['Name']}", axis=1
     )
     fig = px.line(
         module_data,
@@ -459,13 +524,13 @@ def render_rate_module(
         y="Value",
         color="Series",
         markers=True,
-        custom_data=["JobPlain", "Name", "KPI", "Target"],
+        custom_data=["JobPlain", "Name", "DisplayKPI", "Target"],
         color_discrete_sequence=px.colors.qualitative.Safe,
         title=f"{title} · {period_label}",
         labels={
-            "Value": "达成率",
-            "MonthLabel": "月份",
-            "Series": "KPI / 员工",
+            "Value": tr("达成率", "Achievement Rate"),
+            "MonthLabel": tr("月份", "Month"),
+            "Series": tr("KPI / 员工", "KPI / Employee"),
         },
     )
     fig.update_traces(
@@ -473,11 +538,11 @@ def render_rate_module(
         marker=dict(size=8),
         hovertemplate=(
             "<b>KPI：%{customdata[2]}</b><br>"
-            "职位：%{customdata[0]}<br>"
-            "员工：%{customdata[1]}<br>"
-            "月份：%{x}<br>"
-            "达成率：%{y:.1%}<br>"
-            "目标：%{customdata[3]:.0%}<extra></extra>"
+            f"{tr('职位', 'Role')}：%{{customdata[0]}}<br>"
+            f"{tr('员工', 'Employee')}：%{{customdata[1]}}<br>"
+            f"{tr('月份', 'Month')}：%{{x}}<br>"
+            f"{tr('达成率', 'Achievement Rate')}：%{{y:.1%}}<br>"
+            f"{tr('目标', 'Target')}：%{{customdata[3]:.0%}}<extra></extra>"
         ),
     )
     for target in targets:
@@ -486,7 +551,7 @@ def render_rate_module(
             line_dash="dash",
             line_color=INK,
             opacity=0.55,
-            annotation_text=f"目标 {target:.0%}",
+            annotation_text=f"{tr('目标', 'Target')} {target:.0%}",
             annotation_position="top left",
         )
     fig.update_xaxes(
@@ -506,31 +571,35 @@ def render_rate_module(
 
 
 with st.sidebar:
-    st.markdown("## Data & Filters")
-    st.caption("数据与筛选")
+    st.markdown(f"## {tr('数据与筛选', 'Data & Filters')}")
     data_source = st.radio(
-        "Data Source · 数据来源",
-        ["Google Sheets · 自动同步", "Upload Excel · 上传", "Built-in Template · 内置模板"],
+        tr("数据来源", "Data Source"),
+        ["google", "upload", "builtin"],
+        format_func=lambda value: {
+            "google": tr("Google 表格自动同步", "Google Sheets Auto Sync"),
+            "upload": tr("上传 Excel", "Upload Excel"),
+            "builtin": tr("内置模板", "Built-in Template"),
+        }[value],
     )
 
     uploaded = None
-    if data_source == "Google Sheets · 自动同步":
-        st.caption("Auto-refresh every 5 minutes · 每 5 分钟自动同步")
-        st.link_button("Open Google Sheet · 打开表格", GOOGLE_SHEET_URL, width="stretch")
+    if data_source == "google":
+        st.caption(tr("每 5 分钟自动同步", "Auto-refresh every 5 minutes"))
+        st.link_button(tr("打开 Google 表格", "Open Google Sheet"), GOOGLE_SHEET_URL, width="stretch")
         if "google_refresh_token" not in st.session_state:
             st.session_state["google_refresh_token"] = 0
-        if st.button("Refresh Now · 立即刷新", width="stretch"):
+        if st.button(tr("立即刷新", "Refresh Now"), width="stretch"):
             st.session_state["google_refresh_token"] += 1
             st.rerun()
-    elif data_source == "Upload Excel · 上传":
-        st.caption("Upload the workbook · 自动读取工作表2")
-        uploaded = st.file_uploader("KPI Excel · 上传文件", type=["xlsx", "xlsm"])
+    elif data_source == "upload":
+        st.caption(tr("自动读取工作表2", "The app reads Sheet 2 automatically"))
+        uploaded = st.file_uploader(tr("上传 KPI Excel", "Upload KPI Excel"), type=["xlsx", "xlsm"])
     else:
-        st.caption("使用项目内保存的 Excel 数据。")
+        st.caption(tr("使用项目内保存的 Excel 数据。", "Use the Excel file included with the app."))
 
     with SAMPLE_FILE.open("rb") as sample:
         st.download_button(
-            "Download Template · 下载模板",
+            tr("下载模板", "Download Template"),
             data=sample.read(),
             file_name="DCKPI Dashboard.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -538,76 +607,90 @@ with st.sidebar:
         )
 
 try:
-    if data_source == "Google Sheets · 自动同步":
+    if data_source == "google":
         file_bytes, synced_at = fetch_google_bytes(
             GOOGLE_SHEET_URL, st.session_state["google_refresh_token"]
         )
-        source_label = "Google 表格"
-    elif data_source == "Upload Excel · 上传":
+        source_label = tr("Google 表格", "Google Sheets")
+    elif data_source == "upload":
         if uploaded is None:
-            st.info("请上传 Excel 文件。")
+            st.info(tr("请上传 Excel 文件。", "Please upload an Excel file."))
             st.stop()
         file_bytes = uploaded.getvalue()
         synced_at = datetime.now(ZoneInfo("Asia/Shanghai")).strftime(
             "%Y-%m-%d %H:%M:%S"
         )
-        source_label = "上传的 Excel"
+        source_label = tr("上传的 Excel", "Uploaded Excel")
     else:
         file_bytes = SAMPLE_FILE.read_bytes()
-        synced_at = "项目内置文件"
-        source_label = "内置模板"
+        synced_at = tr("项目内置文件", "Built-in file")
+        source_label = tr("内置模板", "Built-in Template")
 
     data, source_info = load_bytes(file_bytes, DATA_SCHEMA_VERSION)
     source_info["source_label"] = source_label
     source_info["synced_at"] = synced_at
 except Exception as exc:
-    st.error(f"数据读取失败：{exc}")
+    st.error(tr(f"数据读取失败：{exc}", f"Failed to load data: {exc}"))
     st.stop()
 
 with st.sidebar:
-    if source_info["source_label"] == "Google 表格":
-        st.success(f"Google 表格已连接\n\n最近同步：{source_info['synced_at']}")
+    if data_source == "google":
+        st.success(
+            tr(
+                f"Google 表格已连接\n\n最近同步：{source_info['synced_at']}",
+                f"Google Sheets connected\n\nLast sync: {source_info['synced_at']}",
+            )
+        )
     else:
-        st.info(f"当前数据源：{source_info['source_label']}")
+        st.info(tr("当前数据源：", "Current source: ") + str(source_info["source_label"]))
 
 all_months = sorted(data["Month"].drop_duplicates().tolist())
 latest_available = max(all_months)
 
 with st.sidebar:
     st.divider()
-    st.markdown("### Period & Team")
-    st.caption("时间与团队筛选")
+    st.markdown(f"### {tr('时间与团队', 'Period & Team')}")
     period_mode = st.radio(
-        "Period · 统计周期",
-        ["Last 12 Months · 最近12个月", "Year to Date · 本年累计", "Custom · 自定义"],
+        tr("统计周期", "Period"),
+        ["last_12", "ytd", "custom"],
+        format_func=lambda value: {
+            "last_12": tr("最近12个月", "Last 12 Months"),
+            "ytd": tr("本年累计", "Year to Date"),
+            "custom": tr("自定义", "Custom"),
+        }[value],
         horizontal=False,
     )
 
-    if period_mode == "Year to Date · 本年累计":
+    if period_mode == "ytd":
         start_month = pd.Timestamp(latest_available.year, 1, 1)
         end_month = latest_available
-    elif period_mode == "Last 12 Months · 最近12个月":
+    elif period_mode == "last_12":
         start_month = latest_available - pd.DateOffset(months=11)
         end_month = latest_available
     else:
         month_labels = [month.strftime("%Y/%m") for month in all_months]
         if len(month_labels) > 1:
             start_label, end_label = st.select_slider(
-                "Month Range · 月份范围",
+                tr("月份范围", "Month Range"),
                 options=month_labels,
                 value=(month_labels[0], month_labels[-1]),
             )
         else:
             start_label = end_label = month_labels[0]
-            st.caption(f"月份：{start_label}")
+            st.caption(f"{tr('月份', 'Month')}: {start_label}")
         start_month = pd.to_datetime(start_label, format="%Y/%m")
         end_month = pd.to_datetime(end_label, format="%Y/%m")
 
     job_options = sorted(data["Job"].unique())
-    selected_jobs = st.multiselect("Role · 职位", job_options, default=job_options)
+    selected_jobs = st.multiselect(
+        tr("职位", "Role"),
+        job_options,
+        default=job_options,
+        format_func=job_plain_label,
+    )
     available_names = sorted(data[data["Job"].isin(selected_jobs)]["Name"].unique())
     selected_names = st.multiselect(
-        "Employee · 员工", available_names, default=available_names
+        tr("员工", "Employee"), available_names, default=available_names
     )
 
 filtered = data[
@@ -617,7 +700,12 @@ filtered = data[
 ].copy()
 
 if filtered.empty:
-    st.warning("当前筛选没有数据，请调整月份、职位或员工。")
+    st.warning(
+        tr(
+            "当前筛选没有数据，请调整月份、职位或员工。",
+            "No data matches the current filters. Adjust the month, role, or employee.",
+        )
+    )
     st.stop()
 
 latest_month = filtered["Month"].max()
@@ -676,17 +764,18 @@ for role in role_order:
         value for job, value in role_counts.items() if role_key(job) == role
     )
     if count:
+        role_name = role_info(role)["zh" if IS_ZH else "en"]
         role_summary_parts.append(
             '<span class="role-chip">'
             f'<span class="role-dot" style="background:{job_color(role)}"></span>'
-            f"{role} {count}人</span>"
+            f"{role_name} {count}{tr('人', '')}</span>"
         )
 for job, count in role_counts.items():
     if role_key(job) not in role_order:
         role_summary_parts.append(
             '<span class="role-chip">'
             f'<span class="role-dot" style="background:{job_color(job)}"></span>'
-            f"{role_key(job)} {count}人</span>"
+            f"{job_plain_label(job)} {count}{tr('人', '')}</span>"
         )
 role_summary = "".join(role_summary_parts)
 
@@ -694,15 +783,19 @@ st.markdown(
     f"""
       <div class="hero-panel">
       <div class="dashboard-title">ZX DC KPI Dashboard</div>
-      <div class="dashboard-subtitle">Development Center Performance · Data through {latest_month:%Y/%m}
-      <span class="dashboard-subtitle-zh">开发中心绩效监控 · 数据截止 {latest_month:%Y年%m月}</span>
-      <span class="team-structure">Team · 团队人员：{role_summary}</span></div>
+      <div class="dashboard-subtitle">{tr(f'开发中心绩效监控 · 数据截止 {latest_month:%Y年%m月}', f'Development Center Performance · Data through {latest_month:%Y/%m}')}<br>
+      <span class="team-structure">{tr('团队人员', 'Team')}：{role_summary}</span></div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-tabs = st.tabs(["KPI Dashboard · KPI 看板", "Performance Detail · 绩效明细"])
+tabs = st.tabs(
+    [
+        tr("KPI 看板", "KPI Dashboard"),
+        tr("绩效明细", "Performance Detail"),
+    ]
+)
 
 with tabs[0]:
     module_options = [
@@ -713,11 +806,20 @@ with tabs[0]:
         "PPS RFT",
         "GO PROD on time",
     ]
+    module_labels = {
+        "3D RFT": tr("3D 一次通过率", "3D RFT"),
+        "TP RFT": tr("TP 一次通过率", "TP RFT"),
+        "TP on time": tr("TP 准时提交", "TP on time"),
+        "SSS RFT": tr("SSS 一次通过率", "SSS RFT"),
+        "PPS RFT": tr("PPS 一次通过率", "PPS RFT"),
+        "GO PROD on time": tr("GO PROD 准时交付", "GO PROD on time"),
+    }
     if st.session_state.get("selected_kpi_module") not in module_options:
         st.session_state["selected_kpi_module"] = module_options[0]
     selected_module = st.pills(
-        "Select KPI Module · 选择 KPI 模块",
+        tr("选择 KPI 模块", "Select KPI Module"),
         module_options,
+        format_func=lambda value: module_labels[value],
         selection_mode="single",
         key="selected_kpi_module",
     ) or module_options[0]
@@ -729,7 +831,7 @@ with tabs[0]:
         ]
         render_rate_module(
             module_data,
-            selected_module,
+            module_labels[selected_module],
             latest_month,
             period_label,
             period_month_labels,
@@ -741,7 +843,7 @@ with tabs[0]:
         ]
         render_rate_module(
             module_data,
-            selected_module,
+            module_labels[selected_module],
             latest_month,
             period_label,
             period_month_labels,
@@ -753,7 +855,7 @@ with tabs[0]:
         ]
         render_rate_module(
             module_data,
-            selected_module,
+            module_labels[selected_module],
             latest_month,
             period_label,
             period_month_labels,
@@ -765,7 +867,7 @@ with tabs[0]:
         ]
         render_rate_module(
             module_data,
-            selected_module,
+            module_labels[selected_module],
             latest_month,
             period_label,
             period_month_labels,
@@ -777,7 +879,7 @@ with tabs[0]:
         ]
         render_rate_module(
             module_data,
-            selected_module,
+            module_labels[selected_module],
             latest_month,
             period_label,
             period_month_labels,
@@ -854,14 +956,17 @@ with tabs[0]:
             )
     else:
         st.caption(
-            "当前 Excel 以“未准时提交次数”记录 TP on time；图表展示异常次数及原因。"
+            tr(
+                "当前 Excel 以“未准时提交次数”记录 TP 准时提交；图表展示异常次数及原因。",
+                "TP on-time performance is recorded as late-submission counts; the chart shows counts and reasons.",
+            )
         )
         exception = filtered[
             filtered["MetricType"].eq("count")
             & filtered["Job"].map(role_key).eq("Modelist")
         ]
         if exception.empty:
-            empty_chart("当前范围没有 TP on time 数据。")
+            empty_chart(tr("当前范围没有 TP 准时提交数据。", "No TP on-time data is available for this period."))
         else:
             exception_monthly = (
                 exception.groupby(["Month", "Job", "Name"], as_index=False)
@@ -883,7 +988,7 @@ with tabs[0]:
                 "Month"
             ].dt.strftime("%Y/%m")
             exception_monthly["Reason"] = exception_monthly["Reason"].fillna(
-                "未填写"
+                tr("未填写", "Not provided")
             )
             exception_monthly["JobPlain"] = exception_monthly["Job"].map(
                 job_plain_label
@@ -904,25 +1009,32 @@ with tabs[0]:
                 markers=True,
                 custom_data=["JobPlain", "Reason"],
                 color_discrete_map=name_color_map,
-                title="TP on time · 未准时提交次数趋势（目标：每人每月 ≤ 2 次）",
-                labels={"Value": "次数", "MonthLabel": "月份", "Name": "员工"},
+                title=tr(
+                    "TP 准时提交 · 未准时提交次数趋势（目标：每人每月 ≤ 2 次）",
+                    "TP on time · Late Submission Trend (Target: ≤ 2 per employee/month)",
+                ),
+                labels={
+                    "Value": tr("次数", "Count"),
+                    "MonthLabel": tr("月份", "Month"),
+                    "Name": tr("员工", "Employee"),
+                },
             )
             fig_exception.update_traces(
                 line=dict(width=3),
                 marker=dict(size=9),
                 hovertemplate=(
-                    "<b>员工：%{fullData.name}</b><br>"
-                    "职位：%{customdata[0]}<br>"
-                    "月份：%{x}<br>"
-                    "未准时提交：%{y:.0f} 次<br>"
-                    "原因：%{customdata[1]}<extra></extra>"
+                    f"<b>{tr('员工', 'Employee')}：%{{fullData.name}}</b><br>"
+                    f"{tr('职位', 'Role')}：%{{customdata[0]}}<br>"
+                    f"{tr('月份', 'Month')}：%{{x}}<br>"
+                    f"{tr('未准时提交次数', 'Late Submissions')}：%{{y:.0f}}<br>"
+                    f"{tr('原因', 'Reason')}：%{{customdata[1]}}<extra></extra>"
                 ),
             )
             fig_exception.add_hline(
                 y=2,
                 line_dash="dash",
                 line_color=RED,
-                annotation_text="目标红线：≤2次/月",
+                annotation_text=tr("目标红线：≤2次/月", "Target: ≤2/month"),
                 annotation_position="top left",
             )
             fig_exception.update_xaxes(
@@ -1273,11 +1385,12 @@ if False:
         )
 
 with tabs[1]:
-    st.markdown(f"### Monthly Performance Data · {period_label}")
-    st.caption("月度绩效明细")
+    st.markdown(f"### {tr('月度绩效明细', 'Monthly Performance Data')} · {period_label}")
     st.caption(
-        "Each KPI stays on a separate row so rates, counts and late-submission reasons remain clear. "
-        "每个 KPI 独立成行，比率、次数和未准时提交原因不会混在一起。"
+        tr(
+            "每个 KPI 独立成行，比率、次数和未准时提交原因不会混在一起。",
+            "Each KPI stays on a separate row so rates, counts, and late-submission reasons remain clear.",
+        )
     )
     raw_monthly = build_raw_monthly_table(filtered)
     st.dataframe(
@@ -1287,17 +1400,20 @@ with tabs[1]:
         height=min(620, 38 * (len(raw_monthly) + 1)),
     )
     st.download_button(
-        "Download Filtered Data · 下载筛选数据",
+        tr("下载筛选数据", "Download Filtered Data"),
         data=raw_monthly.to_csv(index=False).encode("utf-8-sig"),
-        file_name=f"ZX_KPI原始数据_{period_start:%Y%m}_{period_end:%Y%m}.csv",
+        file_name=f"ZX_KPI_data_{period_start:%Y%m}_{period_end:%Y%m}.csv",
         mime="text/csv",
     )
 
-    st.markdown("### Latest & Period Performance")
-    st.caption("最新月份与期间表现")
+    st.markdown(f"### {tr('最新月份与期间表现', 'Latest & Period Performance')}")
     detail = period_detail(filtered)
     display = detail.copy()
     if not display.empty:
+        if not IS_ZH:
+            display["Status"] = display["Status"].replace(
+                {"达标": "On Target", "需关注": "Needs Attention"}
+            )
         for column in ("Latest", "PeriodAverage", "Target"):
             display[column] = display.apply(
                 lambda row: (
@@ -1310,33 +1426,34 @@ with tabs[1]:
                 ),
                 axis=1,
             )
-        display = display.rename(
-            columns={
-                "Job": "职位",
-                "Name": "员工",
-                "KPI": "二级KPI",
-                "KPIGroup": "分类",
-                "Latest": f"{latest_month:%Y/%m}",
-                "PeriodAverage": "期间平均",
-                "Target": "目标",
-                "Months": "有数据月份",
-                "Status": "状态",
-            }
-        )
+        detail_columns = {
+            "Job": tr("职位", "Role"),
+            "Name": tr("员工", "Employee"),
+            "KPI": tr("二级KPI", "KPI"),
+            "KPIGroup": tr("分类", "Category"),
+            "Latest": f"{latest_month:%Y/%m}",
+            "PeriodAverage": tr("期间平均", "Period Average"),
+            "Target": tr("目标", "Target"),
+            "Months": tr("有数据月份", "Months with Data"),
+            "Status": tr("状态", "Status"),
+        }
+        display = display.rename(columns=detail_columns)
         display = display[
             [
-                "职位",
-                "员工",
-                "二级KPI",
-                "分类",
+                detail_columns["Job"],
+                detail_columns["Name"],
+                detail_columns["KPI"],
+                detail_columns["KPIGroup"],
                 f"{latest_month:%Y/%m}",
-                "期间平均",
-                "目标",
-                "状态",
-                "有数据月份",
+                detail_columns["PeriodAverage"],
+                detail_columns["Target"],
+                detail_columns["Status"],
+                detail_columns["Months"],
             ]
         ]
-        display["职位"] = display["职位"].map(job_plain_label)
+        display[detail_columns["Job"]] = display[detail_columns["Job"]].map(job_plain_label)
+        display[detail_columns["KPI"]] = display[detail_columns["KPI"]].map(display_kpi)
+        display[detail_columns["KPIGroup"]] = display[detail_columns["KPIGroup"]].map(display_kpi_group)
         st.dataframe(
             display,
             width="stretch",
@@ -1344,7 +1461,7 @@ with tabs[1]:
             height=min(620, 38 * (len(display) + 1)),
         )
 
-    with st.expander("Standardized Data · 标准化明细"):
+    with st.expander(tr("标准化明细", "Standardized Data")):
         raw_display = filtered.copy()
         raw_display["Month"] = raw_display["Month"].dt.strftime("%Y/%m")
         raw_display["Value"] = raw_display.apply(
@@ -1358,29 +1475,38 @@ with tabs[1]:
             ),
             axis=1,
         )
-        raw_display = raw_display.rename(
-            columns={
-                "Month": "月份",
-                "Job": "职位",
-                "Name": "员工",
-                "KPI": "二级KPI",
-                "KPIGroup": "KPI分类",
-                "MetricType": "数据类型",
-                "Value": "数值",
-            }
-        )
-        raw_display["数据类型"] = raw_display["数据类型"].map(
+        raw_columns = {
+            "Month": tr("月份", "Month"),
+            "Job": tr("职位", "Role"),
+            "Name": tr("员工", "Employee"),
+            "KPI": tr("二级KPI", "KPI"),
+            "KPIGroup": tr("KPI分类", "KPI Category"),
+            "MetricType": tr("数据类型", "Data Type"),
+            "Value": tr("数值", "Value"),
+        }
+        raw_display = raw_display.rename(columns=raw_columns)
+        raw_display[raw_columns["MetricType"]] = raw_display[raw_columns["MetricType"]].map(
             {
-                "rate": "比率",
-                "count": "次数",
-                "duration": "周期",
-                "reason": "原因",
+                "rate": tr("比率", "Rate"),
+                "count": tr("次数", "Count"),
+                "duration": tr("周期", "Duration"),
+                "reason": tr("原因", "Reason"),
             }
-        ).fillna(raw_display["数据类型"])
-        raw_display["职位"] = raw_display["职位"].map(job_plain_label)
+        ).fillna(raw_display[raw_columns["MetricType"]])
+        raw_display[raw_columns["Job"]] = raw_display[raw_columns["Job"]].map(job_plain_label)
+        raw_display[raw_columns["KPI"]] = raw_display[raw_columns["KPI"]].map(display_kpi)
+        raw_display[raw_columns["KPIGroup"]] = raw_display[raw_columns["KPIGroup"]].map(display_kpi_group)
         st.dataframe(
             raw_display[
-                ["月份", "职位", "员工", "二级KPI", "KPI分类", "数据类型", "数值"]
+                [
+                    raw_columns["Month"],
+                    raw_columns["Job"],
+                    raw_columns["Name"],
+                    raw_columns["KPI"],
+                    raw_columns["KPIGroup"],
+                    raw_columns["MetricType"],
+                    raw_columns["Value"],
+                ]
             ],
             width="stretch",
             hide_index=True,
