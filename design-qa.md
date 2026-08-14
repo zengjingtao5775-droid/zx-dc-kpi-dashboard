@@ -47,6 +47,9 @@
 - Python compilation: passed.
 - Six unit tests: passed, including single-row, two-row, and `NA` handling.
 - `git diff --check`: passed.
-- Remaining before release: local browser screenshot, Chinese/English interaction check, console check, push, and production refresh verification.
+- Local browser at 1280 × 720: all 11 cards fit one row without horizontal clipping.
+- Chinese/English interaction and KPI module switching: passed.
+- Browser console warnings/errors: none.
+- Production refresh verification: passed; the live app loaded the new roster and the 50% TP record after a forced Google refresh.
 
-final result: implementation checks passed; production verification pending
+final result: passed
