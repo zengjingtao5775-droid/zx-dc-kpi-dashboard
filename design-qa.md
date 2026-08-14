@@ -3,9 +3,10 @@
 - Source feedback videos:
   - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/6633dedef1d71cf4de927f8195676a71.mp4`
   - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/5825fd22a426d960ff93aa406d1c3778.mp4`
-- Local evidence: macOS Speech transcripts and AVFoundation frames in `/tmp/dashboard-video-analysis.*`.
-- Implementation screenshot: `/tmp/zx-one-row-boxes.png`.
-- Combined comparison: `/tmp/zx-one-row-boxes-comparison.jpg`.
+  - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/7868efa7e12c107efbafaefeecc12582.mp4`
+  - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/fd03a3fa9722ff2d92fd066742d574f9.mp4`
+  - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/03ffa84b257b6799e634d3154ffc06d1.mp4`
+- Local evidence: macOS Speech transcripts, AVFoundation frames, and contact sheets in `/tmp/dashboard-video-three`, `/tmp/dashboard-video-four`, and `/tmp/dashboard-video-five`.
 - Browser viewport and implementation pixels: 1280 × 720 CSS px at 1× density.
 - State: Google 表格自动同步、最近 12 个月、全部职位、全部员工、KPI 模块。
 
@@ -18,17 +19,23 @@
   TP on time, SSS RFT, PPS RFT, and GO PROD on time.
 - Role color blocks and module colors should use the same ownership palette.
 - Module buttons should be rectangular boxes in one desktop row, and the explanatory sentence below them should be removed.
+- Filters should not occupy the default first-screen view, but remain available when needed.
+- The dashboard name should use `DC`, with English as the primary language and smaller Chinese support text.
+- Header role order should follow module ownership: Designer, Modelist, PIS, IE.
+- The redundant target card and blank latest-month card should be removed from each focused module.
+- The data-instructions tab should be removed; retain only KPI Dashboard and Performance Detail.
 
 ## Findings
 
 No actionable P0/P1/P2 findings remain.
 
-- Fonts and typography: the existing Arial/Microsoft YaHei hierarchy remains consistent and module labels are readable.
-- Spacing and layout rhythm: modules use one full-width row of six 178 × 65.6 px rectangular controls at 1280 px; only one focused chart is rendered at a time.
+- Fonts and typography: English is primary in the title, navigation, filters, and focused summary; Chinese is retained as compact support text.
+- Spacing and layout rhythm: modules remain in one full-width row; the sidebar is collapsed by default and the three large metric cards are replaced with one compact period summary.
 - Colors and visual tokens: the Decathlon blue theme, borders, radii, and role colors remain unchanged.
 - Image quality and asset fidelity: no image assets are used in the dashboard UI; Plotly charts remain crisp.
 - Copy and content: the six module names match the requested development order.
 - Ownership colors: Designer/3D is blue, Modelist/TP is orange, PIS/SSS and GO PROD are green, and IE/PPS is pink.
+- Header ownership order now matches the module color sequence.
 
 ## Interaction and runtime checks
 
@@ -38,6 +45,7 @@ No actionable P0/P1/P2 findings remain.
 - Google Sheet data loaded successfully.
 - Browser console warnings/errors: none.
 - Python compilation, four unit tests, and `git diff --check`: passed.
+- Local browser verification confirmed the collapsed filter panel, two-tab navigation, six single-row modules, compact period summary, and removal of the Target card.
 
 ## Comparison history
 

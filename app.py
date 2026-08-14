@@ -43,10 +43,10 @@ ROLE_STYLE = {
     "Design": {"zh": "设计", "color": DESIGNER_BLUE},
 }
 st.set_page_config(
-    page_title="ZX R&D KPI Dashboard",
+    page_title="ZX DC KPI Dashboard",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 st.markdown(
@@ -74,7 +74,7 @@ st.markdown(
       [data-testid="stMetric"] {
         background: white; border: 1px solid #D6EAF5; border-radius: 14px;
         padding: 18px 20px; box-shadow: 0 5px 16px rgba(0,130,195,.07);
-        height: 138px; box-sizing: border-box;
+        height: 112px; box-sizing: border-box;
         display: flex; flex-direction: column; justify-content: center;
       }
       [data-testid="stMetricLabel"] { color: #5E7482; }
@@ -86,10 +86,24 @@ st.markdown(
       }
       .dashboard-title { font-size: 2.15rem; font-weight: 750; color: #FFFFFF; }
       .dashboard-subtitle {
-        color: #E5F6FF; margin-top: 5px; line-height: 1.55;
+        color: #FFFFFF; margin-top: 7px; line-height: 1.45;
+        font-size: 1rem; font-weight: 650;
         overflow-wrap: anywhere;
       }
-      .team-structure { font-size: .93rem; opacity: .96; }
+      .dashboard-subtitle-zh {
+        display: block; color: #D7F1FF; font-size: .82rem; font-weight: 500;
+        margin-top: 2px;
+      }
+      .team-structure { font-size: .92rem; opacity: .98; }
+      .module-summary {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 18px; margin: 12px 0 14px; padding: 12px 18px;
+        background: #FFFFFF; border: 1px solid #D6EAF5; border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,130,195,.05);
+      }
+      .module-summary-label { color: #5E7482; font-size: .88rem; }
+      .module-summary-value { color: #12324A; font-size: 1.65rem; font-weight: 700; }
+      .module-summary-zh { font-size: .78rem; opacity: .82; }
       .role-chip { display: inline-flex; align-items: center; margin-right: 12px; }
       .role-dot {
         display: inline-block; width: 10px; height: 10px; border-radius: 3px;
@@ -413,18 +427,26 @@ def render_rate_module(
         empty_chart(f"当前筛选范围没有“{title}”数据。")
         return
 
-    latest_rows = module_data[module_data["Month"].eq(latest_month)]
-    latest_value = (
-        float(latest_rows["Value"].mean()) if not latest_rows.empty else None
-    )
     period_value = float(module_data["Value"].mean())
     targets = sorted(module_data["Target"].dropna().unique())
-    target_text = " / ".join(f"{target:.0%}" for target in targets) or "—"
 
-    summary_cols = st.columns(3)
-    summary_cols[0].metric(f"{latest_month:%Y/%m}", percent(latest_value))
-    summary_cols[1].metric(f"期间平均 · {period_label}", percent(period_value))
-    summary_cols[2].metric("目标", target_text)
+    st.markdown(
+        f"""
+        <div class="module-summary">
+          <div>
+            <div class="module-summary-label">Selected Period</div>
+            <div>{period_label}</div>
+            <div class="module-summary-zh">当前统计周期</div>
+          </div>
+          <div style="text-align:right">
+            <div class="module-summary-label">Period Average</div>
+            <div class="module-summary-value">{percent(period_value)}</div>
+            <div class="module-summary-zh">期间平均</div>
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     module_data["MonthLabel"] = module_data["Month"].dt.strftime("%Y/%m")
     module_data["JobPlain"] = module_data["Job"].map(job_plain_label)
@@ -478,36 +500,37 @@ def render_rate_module(
         range=[0.5, max(1.04, max_value * 1.04)],
     )
     st.plotly_chart(
-        format_axis(fig, 430),
+        format_axis(fig, 370),
         config={"displayModeBar": False},
     )
 
 
 with st.sidebar:
-    st.markdown("## 数据控制台")
+    st.markdown("## Data & Filters")
+    st.caption("数据与筛选")
     data_source = st.radio(
-        "数据来源",
-        ["Google 表格自动同步", "上传 Excel", "内置模板"],
+        "Data Source · 数据来源",
+        ["Google Sheets · 自动同步", "Upload Excel · 上传", "Built-in Template · 内置模板"],
     )
 
     uploaded = None
-    if data_source == "Google 表格自动同步":
-        st.caption("默认每 5 分钟重新获取一次公开 Google 表格。")
-        st.link_button("打开 Google 表格", GOOGLE_SHEET_URL, width="stretch")
+    if data_source == "Google Sheets · 自动同步":
+        st.caption("Auto-refresh every 5 minutes · 每 5 分钟自动同步")
+        st.link_button("Open Google Sheet · 打开表格", GOOGLE_SHEET_URL, width="stretch")
         if "google_refresh_token" not in st.session_state:
             st.session_state["google_refresh_token"] = 0
-        if st.button("立即刷新 Google 数据", width="stretch"):
+        if st.button("Refresh Now · 立即刷新", width="stretch"):
             st.session_state["google_refresh_token"] += 1
             st.rerun()
-    elif data_source == "上传 Excel":
-        st.caption("上传整份 Excel，系统会自动读取“工作表2”（或第二张工作表）。")
-        uploaded = st.file_uploader("上传 KPI Excel", type=["xlsx", "xlsm"])
+    elif data_source == "Upload Excel · 上传":
+        st.caption("Upload the workbook · 自动读取工作表2")
+        uploaded = st.file_uploader("KPI Excel · 上传文件", type=["xlsx", "xlsm"])
     else:
         st.caption("使用项目内保存的 Excel 数据。")
 
     with SAMPLE_FILE.open("rb") as sample:
         st.download_button(
-            "下载当前 Excel 模板",
+            "Download Template · 下载模板",
             data=sample.read(),
             file_name="DCKPI Dashboard.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -515,12 +538,12 @@ with st.sidebar:
         )
 
 try:
-    if data_source == "Google 表格自动同步":
+    if data_source == "Google Sheets · 自动同步":
         file_bytes, synced_at = fetch_google_bytes(
             GOOGLE_SHEET_URL, st.session_state["google_refresh_token"]
         )
         source_label = "Google 表格"
-    elif data_source == "上传 Excel":
+    elif data_source == "Upload Excel · 上传":
         if uploaded is None:
             st.info("请上传 Excel 文件。")
             st.stop()
@@ -552,24 +575,25 @@ latest_available = max(all_months)
 
 with st.sidebar:
     st.divider()
-    st.markdown("### 筛选范围")
+    st.markdown("### Period & Team")
+    st.caption("时间与团队筛选")
     period_mode = st.radio(
-        "统计窗口",
-        ["最近12个月", "本年累计（YTD）", "自定义"],
+        "Period · 统计周期",
+        ["Last 12 Months · 最近12个月", "Year to Date · 本年累计", "Custom · 自定义"],
         horizontal=False,
     )
 
-    if period_mode == "本年累计（YTD）":
+    if period_mode == "Year to Date · 本年累计":
         start_month = pd.Timestamp(latest_available.year, 1, 1)
         end_month = latest_available
-    elif period_mode == "最近12个月":
+    elif period_mode == "Last 12 Months · 最近12个月":
         start_month = latest_available - pd.DateOffset(months=11)
         end_month = latest_available
     else:
         month_labels = [month.strftime("%Y/%m") for month in all_months]
         if len(month_labels) > 1:
             start_label, end_label = st.select_slider(
-                "月份",
+                "Month Range · 月份范围",
                 options=month_labels,
                 value=(month_labels[0], month_labels[-1]),
             )
@@ -580,10 +604,10 @@ with st.sidebar:
         end_month = pd.to_datetime(end_label, format="%Y/%m")
 
     job_options = sorted(data["Job"].unique())
-    selected_jobs = st.multiselect("职位", job_options, default=job_options)
+    selected_jobs = st.multiselect("Role · 职位", job_options, default=job_options)
     available_names = sorted(data[data["Job"].isin(selected_jobs)]["Name"].unique())
     selected_names = st.multiselect(
-        "员工", available_names, default=available_names
+        "Employee · 员工", available_names, default=available_names
     )
 
 filtered = data[
@@ -645,7 +669,7 @@ role_counts = (
     .nunique()
     .to_dict()
 )
-role_order = ["IE", "Modelist", "Designer", "PIS"]
+role_order = ["Designer", "Modelist", "PIS", "IE"]
 role_summary_parts = []
 for role in role_order:
     count = sum(
@@ -669,15 +693,16 @@ role_summary = "".join(role_summary_parts)
 st.markdown(
     f"""
       <div class="hero-panel">
-      <div class="dashboard-title">ZX R&amp;D KPI Dashboard</div>
-      <div class="dashboard-subtitle">研发团队绩效监控 · 数据截止 {latest_month:%Y年%m月}<br>
-      <span class="team-structure">团队人员：{role_summary}</span></div>
+      <div class="dashboard-title">ZX DC KPI Dashboard</div>
+      <div class="dashboard-subtitle">Development Center Performance · Data through {latest_month:%Y/%m}
+      <span class="dashboard-subtitle-zh">开发中心绩效监控 · 数据截止 {latest_month:%Y年%m月}</span>
+      <span class="team-structure">Team · 团队人员：{role_summary}</span></div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-tabs = st.tabs(["KPI 模块", "绩效明细", "数据说明"])
+tabs = st.tabs(["KPI Dashboard · KPI 看板", "Performance Detail · 绩效明细"])
 
 with tabs[0]:
     module_options = [
@@ -691,7 +716,7 @@ with tabs[0]:
     if st.session_state.get("selected_kpi_module") not in module_options:
         st.session_state["selected_kpi_module"] = module_options[0]
     selected_module = st.pills(
-        "选择 KPI 模块（点击后仅显示该模块）",
+        "Select KPI Module · 选择 KPI 模块",
         module_options,
         selection_mode="single",
         key="selected_kpi_module",
@@ -1248,10 +1273,11 @@ if False:
         )
 
 with tabs[1]:
-    st.markdown(f"### 工作表2原始月度数据 · {period_label}")
+    st.markdown(f"### Monthly Performance Data · {period_label}")
+    st.caption("月度绩效明细")
     st.caption(
-        "每个 KPI 保留为独立行；比率、次数和原因不会混在一起。"
-        "例如 Bethy 的“样品一次通过率”“未准时提交的次数”和原因会分别展示。"
+        "Each KPI stays on a separate row so rates, counts and late-submission reasons remain clear. "
+        "每个 KPI 独立成行，比率、次数和未准时提交原因不会混在一起。"
     )
     raw_monthly = build_raw_monthly_table(filtered)
     st.dataframe(
@@ -1261,13 +1287,14 @@ with tabs[1]:
         height=min(620, 38 * (len(raw_monthly) + 1)),
     )
     st.download_button(
-        "下载当前筛选的原始月度数据",
+        "Download Filtered Data · 下载筛选数据",
         data=raw_monthly.to_csv(index=False).encode("utf-8-sig"),
         file_name=f"ZX_KPI原始数据_{period_start:%Y%m}_{period_end:%Y%m}.csv",
         mime="text/csv",
     )
 
-    st.markdown("### 最新月份与期间表现")
+    st.markdown("### Latest & Period Performance")
+    st.caption("最新月份与期间表现")
     detail = period_detail(filtered)
     display = detail.copy()
     if not display.empty:
@@ -1317,7 +1344,7 @@ with tabs[1]:
             height=min(620, 38 * (len(display) + 1)),
         )
 
-    with st.expander("查看标准化后的明细数据"):
+    with st.expander("Standardized Data · 标准化明细"):
         raw_display = filtered.copy()
         raw_display["Month"] = raw_display["Month"].dt.strftime("%Y/%m")
         raw_display["Value"] = raw_display.apply(
@@ -1358,39 +1385,3 @@ with tabs[1]:
             width="stretch",
             hide_index=True,
         )
-
-with tabs[2]:
-    st.markdown("### Excel 更新规则")
-    st.markdown(
-        """
-        1. 保留前三列：`Job`、`Name`、`2级KPI`。
-        2. 从第 4 列开始，每一列代表一个月份；建议直接使用 Excel 日期并显示为 `yyyy/m`。
-        3. 比率可填写 `95%`、`0.95` 或 `95`，系统会自动统一。
-        4. “未准时提交的次数”等计数 KPI 直接填写整数。
-        5. 原因使用独立行“未准时提交的原因”，在对应月份填写文字。
-        6. 上传整份 Excel 即可，系统优先读取名为“工作表2”的工作表。
-        """
-    )
-    quality_cols = st.columns(5)
-    quality_cols[0].metric("数据来源", str(source_info["source_label"]))
-    quality_cols[1].metric("职位", str(source_info["job_count"]))
-    quality_cols[2].metric("员工", str(source_info["employee_count"]))
-    quality_cols[3].metric("月份", str(source_info["month_count"]))
-    quality_cols[4].metric("有效数据点", str(source_info["data_points"]))
-    st.caption(
-        f"读取工作表：{source_info['sheet_name']} · "
-        f"最近同步：{source_info['synced_at']}"
-    )
-    st.caption(f"其中包含 {source_info['reason_count']} 条未准时提交原因记录。")
-
-    if source_info["invalid_numeric"]:
-        st.warning(f"发现 {source_info['invalid_numeric']} 个非数字 KPI 值，已跳过。")
-    if source_info["duplicate_count"]:
-        st.warning(
-            f"发现 {source_info['duplicate_count']} 条重复的“职位+员工+KPI+月份”记录，"
-            "图表会按平均值汇总。"
-        )
-    st.markdown(
-        '<span class="status-chip">当前数据结构校验通过</span>',
-        unsafe_allow_html=True,
-    )
