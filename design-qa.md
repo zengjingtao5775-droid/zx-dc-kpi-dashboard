@@ -62,5 +62,6 @@
 - Production refresh verification: passed; the live app loaded the new roster and the 50% TP record after a forced Google refresh.
 - Production MARKER verification: passed; both MARKER cards are orange, both employee panels render independently, and the browser console has no warnings or errors.
 - Local TF verification: passed; TF RFT is visible as a third TP RFT series, TF ON TIME appears when recorded, explicit 0% values are plotted, and the main-driver label identifies the lowest sub-KPI and month.
+- Production TF verification: passed; both TF series and the main-driver label are present after deployment, the 0% y-axis is visible when needed, and the browser console has no warnings or errors.
 
 final result: passed
