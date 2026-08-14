@@ -506,6 +506,21 @@ def render_rate_module(
         module_data["MetricType"].eq("rate")
     ].copy()
     if module_data.empty:
+        st.markdown(
+            f"""
+            <div class="module-summary">
+              <div>
+                <div class="module-summary-label">{tr("统计周期", "Selected Period")}</div>
+                <div>{period_label}</div>
+              </div>
+              <div style="text-align:right">
+                <div class="module-summary-label">{tr("期间平均", "Period Average")}</div>
+                <div class="module-summary-value">—</div>
+              </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         empty_chart(
             tr(
                 f"当前筛选范围没有“{title}”数据。",
@@ -606,10 +621,12 @@ def render_employee_rate_modules(
     latest_month: pd.Timestamp,
     period_label: str,
     period_month_labels: list[str],
+    employee_names: list[str] | None = None,
 ) -> None:
-    """Keep each employee's TP trend separate so overlapping lines stay readable."""
+    """Keep fixed employee panels so TP trends never share one chart."""
     rate_data = module_data[module_data["MetricType"].eq("rate")].copy()
-    if rate_data.empty:
+    names = employee_names or sorted(rate_data["Name"].dropna().unique())
+    if not names:
         render_rate_module(
             module_data,
             title,
@@ -619,10 +636,10 @@ def render_employee_rate_modules(
         )
         return
 
-    names = sorted(rate_data["Name"].dropna().unique())
     if len(names) <= 1:
+        st.markdown(f"#### {names[0]}")
         render_rate_module(
-            rate_data,
+            rate_data[rate_data["Name"].eq(names[0])],
             title,
             latest_month,
             period_label,
@@ -633,9 +650,10 @@ def render_employee_rate_modules(
     columns = st.columns(2)
     for index, name in enumerate(names):
         with columns[index % 2]:
+            st.markdown(f"#### {name}")
             render_rate_module(
                 rate_data[rate_data["Name"].eq(name)],
-                f"{title} · {name}",
+                title,
                 latest_month,
                 period_label,
                 period_month_labels,
@@ -895,6 +913,12 @@ tabs = st.tabs(
 )
 
 with tabs[0]:
+    modelist_names = sorted(
+        roster[
+            roster["Job"].map(role_key).eq("Modelist")
+            & roster["Name"].isin(selected_names)
+        ]["Name"].unique()
+    )
     module_options = [
         "TP RFT",
         "TP ON TIME",
@@ -1010,6 +1034,7 @@ with tabs[0]:
             latest_month,
             period_label,
             period_month_labels,
+            modelist_names,
         )
     elif (
         selected_module == "TP ON TIME"
@@ -1024,6 +1049,7 @@ with tabs[0]:
             latest_month,
             period_label,
             period_month_labels,
+            modelist_names,
         )
     elif selected_module in {"PPS RFT", "PPS ON TIME"}:
         module_data = selected_module_data

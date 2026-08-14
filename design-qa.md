@@ -5,6 +5,7 @@
 - Latest feedback evidence:
   - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/1267f9058bc700e8dde185addfab02eb.mp4`
   - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/491187727852e1bd4e3c33391563b4e4.mp4`
+  - `/Users/eric/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_6xm3vfori24k22_314b/temp/RWTemp/2026-08/b7da15e2b37c9fd6fd77857846bc92ae/85b1c9518cc213994b748297ccdabdbe.mp4`
 - Video analysis: local macOS Speech and AVFoundation only; no upload.
 - Browser viewport: 1280 × 720 CSS px at 1× density.
 
@@ -26,7 +27,7 @@
   9. SSS ON TIME
   10. PPS RFT
   11. PPS ON TIME
-- Split TP charts by employee so Mengli Jiang and Jiao Chen never cover each other's trend lines.
+- Split TP charts into fixed left/right employee panels so Jiao Chen and Mengli Jiang never share one chart. Keep an employee's panel visible with `—` when their data has not been entered yet.
 - Treat `NA` or `N/A` as not applicable: do not calculate it, do not count it as invalid data, and display no KPI value.
 - Keep a fully Chinese interface in Chinese mode and a fully English interface in English mode.
 - Do not fabricate values for blank source cells.
