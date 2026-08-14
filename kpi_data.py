@@ -69,7 +69,10 @@ def target_for_kpi(kpi: str, metric_type: str) -> float | None:
         return 0.0
     if metric_type == "duration":
         return None
-    if any(token in key for token in ("bom", "3d", "goprod", "开发准时", "sotpace")):
+    if any(
+        token in key
+        for token in ("bom", "3d", "goprod", "开发准时", "sotpace", "ontime")
+    ):
         return 1.0
     if any(token in key for token in ("pap", "tf", "样品一次", "rft")):
         return 0.95

@@ -28,6 +28,7 @@ DARK_GREEN = "#1F7A3D"
 YELLOW = "#F2C94C"
 ORANGE = "#F2994A"
 PINK = "#F36FB4"
+ME_PURPLE = "#7B61FF"
 RED = "#EB5757"
 BLUE = DECATHLON_BLUE
 DESIGNER_BLUE = "#2EA8E5"
@@ -41,6 +42,7 @@ ROLE_STYLE = {
     "Modelist": {"zh": "版师", "en": "Modelist", "color": ORANGE},
     "Designer": {"zh": "设计", "en": "Designer", "color": DESIGNER_BLUE},
     "Design": {"zh": "设计", "en": "Designer", "color": DESIGNER_BLUE},
+    "ME": {"zh": "ME", "en": "ME", "color": ME_PURPLE},
 }
 st.set_page_config(
     page_title="ZX DC KPI Dashboard",
@@ -117,20 +119,20 @@ st.markdown(
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] {
         display: grid !important;
-        grid-template-columns: repeat(6, minmax(150px, 1fr)) !important;
-        gap: 10px !important; width: 100% !important;
+        grid-template-columns: repeat(10, minmax(100px, 1fr)) !important;
+        gap: 6px !important; width: 100% !important;
         overflow-x: auto !important; padding-bottom: 3px !important;
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button {
         width: 100% !important; min-height: 4.1rem !important;
-        padding: .78rem .75rem !important;
+        padding: .66rem .35rem !important;
         border-width: 2px !important; border-radius: 10px !important;
-        font-size: 1.05rem !important; font-weight: 700 !important;
+        font-size: .82rem !important; font-weight: 700 !important;
         justify-content: center !important;
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button p {
-        font-size: 1.05rem !important; line-height: 1.2 !important;
-        white-space: nowrap !important;
+        font-size: .82rem !important; line-height: 1.18 !important;
+        white-space: normal !important;
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1) {
         border-color: #2EA8E5 !important; background: #EAF7FF !important; color: #005A9C !important;
@@ -140,18 +142,20 @@ st.markdown(
         border-color: #F2994A !important; background: #FFF3E8 !important; color: #A95108 !important;
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4),
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5),
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6) {
         border-color: #54B435 !important; background: #EEF9EA !important; color: #1F7A3D !important;
       }
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5) {
-        border-color: #F36FB4 !important; background: #FFF0F8 !important; color: #B3367D !important;
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(n+7) {
+        border-color: #7B61FF !important; background: #F3F0FF !important; color: #5239C7 !important;
       }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(1)[kind="pillsActive"] { background: #2EA8E5 !important; color: white !important; }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(2)[kind="pillsActive"],
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(3)[kind="pillsActive"] { background: #F2994A !important; color: white !important; }
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(4)[kind="pillsActive"],
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5)[kind="pillsActive"],
       .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(6)[kind="pillsActive"] { background: #54B435 !important; color: white !important; }
-      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(5)[kind="pillsActive"] { background: #F36FB4 !important; color: white !important; }
+      .st-key-selected_kpi_module [data-testid="stButtonGroup"] [role="radiogroup"] button:nth-child(n+7)[kind="pillsActive"] { background: #7B61FF !important; color: white !important; }
       .st-key-ui_language [data-testid="stButtonGroup"] { justify-content: flex-end; }
       .st-key-ui_language button { min-width: 92px; font-weight: 700; }
       .section-note {
@@ -757,7 +761,7 @@ role_counts = (
     .nunique()
     .to_dict()
 )
-role_order = ["Designer", "Modelist", "PIS", "IE"]
+role_order = ["Designer", "Modelist", "PIS", "ME", "IE"]
 role_summary_parts = []
 for role in role_order:
     count = sum(
@@ -805,6 +809,10 @@ with tabs[0]:
         "SSS RFT",
         "PPS RFT",
         "GO PROD on time",
+        "MARKER RFT",
+        "MARKER ON TIME",
+        "SOT RFT",
+        "SOT ON TIME",
     ]
     module_labels = {
         "3D RFT": tr("3D 一次通过率", "3D RFT"),
@@ -813,6 +821,10 @@ with tabs[0]:
         "SSS RFT": tr("SSS 一次通过率", "SSS RFT"),
         "PPS RFT": tr("PPS 一次通过率", "PPS RFT"),
         "GO PROD on time": tr("GO PROD 准时交付", "GO PROD on time"),
+        "MARKER RFT": tr("MARKER 一次通过率", "MARKER RFT"),
+        "MARKER ON TIME": tr("MARKER 准时交付", "MARKER ON TIME"),
+        "SOT RFT": tr("SOT 一次通过率", "SOT RFT"),
+        "SOT ON TIME": tr("SOT 准时交付", "SOT ON TIME"),
     }
     if st.session_state.get("selected_kpi_module") not in module_options:
         st.session_state["selected_kpi_module"] = module_options[0]
@@ -850,8 +862,9 @@ with tabs[0]:
         )
     elif selected_module == "PPS RFT":
         module_data = filtered[
-            filtered["Job"].map(role_key).eq("IE")
-            & filtered["MetricType"].eq("rate")
+            filtered["Job"].map(role_key).eq("PIS")
+            & filtered["KPI"].str.contains("PPS", case=False, na=False)
+            & filtered["KPIGroup"].eq("RFT")
         ]
         render_rate_module(
             module_data,
@@ -863,6 +876,7 @@ with tabs[0]:
     elif selected_module == "SSS RFT":
         module_data = filtered[
             filtered["Job"].map(role_key).eq("PIS")
+            & filtered["KPI"].str.contains("SSS|样品", case=False, regex=True, na=False)
             & filtered["KPIGroup"].eq("RFT")
         ]
         render_rate_module(
@@ -876,6 +890,21 @@ with tabs[0]:
         module_data = filtered[
             filtered["Job"].map(role_key).eq("PIS")
             & filtered["KPI"].str.contains("GO PROD", case=False, na=False)
+        ]
+        render_rate_module(
+            module_data,
+            module_labels[selected_module],
+            latest_month,
+            period_label,
+            period_month_labels,
+        )
+    elif selected_module in {"MARKER RFT", "MARKER ON TIME", "SOT RFT", "SOT ON TIME"}:
+        family = "MARKER" if selected_module.startswith("MARKER") else "SOT"
+        kpi_group = "RFT" if selected_module.endswith("RFT") else "准时交付"
+        module_data = filtered[
+            filtered["Job"].map(role_key).eq("ME")
+            & filtered["KPI"].str.contains(family, case=False, na=False)
+            & filtered["KPIGroup"].eq(kpi_group)
         ]
         render_rate_module(
             module_data,

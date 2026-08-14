@@ -25,6 +25,8 @@
 - The redundant target card and blank latest-month card should be removed from each focused module.
 - The data-instructions tab should be removed; retain only KPI Dashboard and Performance Detail.
 - A visible Chinese/English switch should replace the mixed-language interface; each mode must use one language consistently.
+- PPS RFT belongs to PIS and must use the PIS green ownership color.
+- ME requires four focused modules: MARKER RFT, MARKER ON TIME, SOT RFT, and SOT ON TIME.
 
 ## Findings
 
@@ -38,6 +40,7 @@ No actionable P0/P1/P2 findings remain.
 - Ownership colors: Designer/3D is blue, Modelist/TP is orange, PIS/SSS and GO PROD are green, and IE/PPS is pink.
 - Header ownership order now matches the module color sequence.
 - The language switch is positioned above the hero panel. Chinese mode localizes navigation, filters, role names, module names, summaries, chart labels, tooltips, and tables; English mode localizes the same surfaces and translates known source KPI names.
+- The KPI row now contains ten boxes in one desktop row. PPS uses PIS green; the four ME boxes use a dedicated purple ownership color and are ready to populate when ME rows are added to the source sheet.
 
 ## Interaction and runtime checks
 
@@ -49,6 +52,7 @@ No actionable P0/P1/P2 findings remain.
 - Python compilation, four unit tests, and `git diff --check`: passed.
 - Local browser verification confirmed the collapsed filter panel, two-tab navigation, six single-row modules, compact period summary, and removal of the Target card.
 - Language QA confirmed that the English interface contains no Chinese text except the `中文` switch label, including the TP on-time exception module; Chinese and English performance-detail views also load successfully.
+- Current Google Sheet verification (2026-08-14) found no ME rows and no PIS KPI containing PPS, so those new modules correctly show an empty-data message instead of borrowing unrelated IE or PIS metrics.
 
 ## Comparison history
 

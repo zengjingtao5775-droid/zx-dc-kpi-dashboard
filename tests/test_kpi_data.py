@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 
 from google_source import extract_google_sheet_id, google_sheet_export_url
-from kpi_data import classify_kpi, load_kpi_data, parse_month_header
+from kpi_data import classify_kpi, load_kpi_data, parse_month_header, target_for_kpi
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,6 +32,11 @@ class KPIDataTests(unittest.TestCase):
         self.assertEqual(
             classify_kpi("未准时提交的原因"), ("reason", "未准时原因")
         )
+        self.assertEqual(classify_kpi("MARKER RFT"), ("rate", "RFT"))
+        self.assertEqual(classify_kpi("MARKER ON TIME"), ("rate", "准时交付"))
+        self.assertEqual(classify_kpi("SOT RFT"), ("rate", "RFT"))
+        self.assertEqual(classify_kpi("SOT ON TIME"), ("rate", "准时交付"))
+        self.assertEqual(target_for_kpi("SOT ON TIME", "rate"), 1.0)
 
     def test_sample_workbook(self):
         data, info = load_kpi_data(SAMPLE)
