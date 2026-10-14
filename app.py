@@ -34,7 +34,7 @@ BLUE = DECATHLON_BLUE
 DESIGNER_BLUE = "#2EA8E5"
 INK = "#12324A"
 MUTED = "#5E7482"
-DATA_SCHEMA_VERSION = 7
+DATA_SCHEMA_VERSION = 8
 
 ROLE_STYLE = {
     "IE": {"zh": "工程", "en": "IE", "color": PINK},
@@ -1027,8 +1027,25 @@ with tabs[0]:
         else:
             summary_value = "—"
         module_button_labels[option] = f"{module_labels[option]}\n{summary_value}"
+    filter_signature = (
+        tuple(sorted(selected_jobs)),
+        tuple(sorted(selected_names)),
+        str(start_month),
+        str(end_month),
+    )
+    filters_changed = st.session_state.get("kpi_filter_signature") != filter_signature
+    st.session_state["kpi_filter_signature"] = filter_signature
     if st.session_state.get("selected_kpi_module") not in module_options:
         st.session_state["selected_kpi_module"] = module_options[0]
+    if filters_changed and module_data_for(
+        st.session_state["selected_kpi_module"]
+    ).empty:
+        # A role/employee change should open a relevant trend, not the old role's
+        # empty module. Explicit clicks on empty modules still show no-data state.
+        st.session_state["selected_kpi_module"] = next(
+            (option for option in module_options if not module_data_for(option).empty),
+            module_options[0],
+        )
     selected_module = st.pills(
         tr("选择 KPI 模块", "Select KPI Module"),
         module_options,
@@ -1043,7 +1060,7 @@ with tabs[0]:
             filtered["Job"].map(role_key).eq("Designer")
             & filtered["KPI"].str.contains("3D", case=False, na=False)
         ]
-        render_rate_module(
+        render_employee_rate_modules(
             module_data,
             module_labels[selected_module],
             latest_month,
@@ -1077,7 +1094,7 @@ with tabs[0]:
         )
     elif selected_module in {"PPS RFT", "PPS ON TIME"}:
         module_data = selected_module_data
-        render_rate_module(
+        render_employee_rate_modules(
             module_data,
             module_labels[selected_module],
             latest_month,
@@ -1086,7 +1103,7 @@ with tabs[0]:
         )
     elif selected_module in {"SSS RFT", "SSS ON TIME"}:
         module_data = selected_module_data
-        render_rate_module(
+        render_employee_rate_modules(
             module_data,
             module_labels[selected_module],
             latest_month,
@@ -1105,7 +1122,7 @@ with tabs[0]:
         )
     elif selected_module in {"SOT RFT", "SOT ON TIME"}:
         module_data = selected_module_data
-        render_rate_module(
+        render_employee_rate_modules(
             module_data,
             module_labels[selected_module],
             latest_month,

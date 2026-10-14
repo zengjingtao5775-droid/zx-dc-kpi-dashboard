@@ -74,6 +74,9 @@ def target_for_kpi(kpi: str, metric_type: str) -> float | None:
         return 2.0
     if metric_type == "duration":
         return None
+    # All TP first-pass KPIs share the same assessment target.
+    if key.startswith("tp") and classify_kpi(kpi)[1] == "RFT":
+        return 0.95
     if any(
         token in key
         for token in ("bom", "3d", "goprod", "开发准时", "sotpace", "ontime")
