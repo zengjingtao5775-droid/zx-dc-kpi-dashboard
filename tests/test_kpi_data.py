@@ -60,6 +60,26 @@ class KPIDataTests(unittest.TestCase):
         self.assertIn("样品间排单拥挤", reasons["Reason"].tolist())
         self.assertTrue(reasons["Target"].isna().all())
 
+    def test_tp_rft_uses_one_assessment_target(self):
+        for component in ("BOM", "PAP", "TF"):
+            with self.subTest(component=component):
+                self.assertEqual(target_for_kpi(f"TP {component} RFT", "rate"), 0.95)
+                self.assertEqual(target_for_kpi(f"TP {component} ON TIME", "rate"), 1.0)
+        self.assertEqual(target_for_kpi("3D RFT", "rate"), 1.0)
+
+        workbook = BytesIO()
+        with pd.ExcelWriter(workbook, engine="openpyxl") as writer:
+            pd.DataFrame({
+                "JOB": ["Modelist"] * 3,
+                "NAME": ["Jiao Chen"] * 3,
+                "KPI": [f"TP {component} RFT" for component in ("BOM", "PAP", "TF")],
+                "2026/9": [0.96, 0.94, 0],
+            }).to_excel(writer, sheet_name="DATABASE for Dashboard", index=False)
+        workbook.seek(0)
+        data, _ = load_kpi_data(workbook)
+        self.assertEqual(data["Target"].unique().tolist(), [0.95])
+        self.assertEqual(data["Value"].ge(data["Target"]).tolist(), [True, False, False])
+
     def test_two_row_dashboard_database(self):
         workbook = BytesIO()
         dashboard_rows = pd.DataFrame(
