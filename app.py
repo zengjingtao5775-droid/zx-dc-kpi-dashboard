@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
+import re
 from zoneinfo import ZoneInfo
 
 import pandas as pd
@@ -207,7 +208,7 @@ KPI_ENGLISH = {
     "BOM 一次通过率": "BOM RFT",
     "GO PROD ontime": "GO PROD on time",
     "PAP 一次通过率": "PAP RFT",
-    "SOT PACE中的交付准确率": "SOT PACE Delivery Accuracy",
+    "SAM PACE中的交付准确率": "SAM PACE Delivery Accuracy",
     "TF 一次通过率": "TF RFT",
     "开发准时完成率": "Development On-time Completion Rate",
     "未准时提交的原因": "Late Submission Reason",
@@ -224,8 +225,8 @@ KPI_CHINESE = {
     "TP TF ON TIME": "TP TF 准时交付",
     "Marker RFT": "MARKER 一次通过率",
     "Marker ON TIME": "MARKER 准时交付",
-    "SOT RFT": "SOT 一次通过率",
-    "SOT ON TIME": "SOT 准时交付",
+    "SAM RFT": "SAM 一次通过率",
+    "SAM ON TIME": "SAM 准时交付率",
     "SSS RFT": "SSS 一次通过率",
     "SSS ON TIME": "SSS 准时交付",
     "PPS RFT": "PPS 一次通过率",
@@ -239,7 +240,8 @@ KPI_GROUP_ENGLISH = {
 
 
 def display_kpi(value: object) -> str:
-    text = str(value)
+    # Keep existing source names readable under the new SAM terminology.
+    text = re.sub(r"^(?:SOT|SOP)\b", "SAM", str(value), flags=re.IGNORECASE)
     return KPI_CHINESE.get(text, text) if IS_ZH else KPI_ENGLISH.get(text, text)
 
 
@@ -988,7 +990,7 @@ with tabs[0]:
                 & filtered["KPI"].str.contains("PPS", case=False, na=False)
                 & filtered["KPIGroup"].eq(kpi_group)
             ]
-        family = "MARKER" if module_name.startswith("MARKER") else "SOT"
+        family = "MARKER" if module_name.startswith("MARKER") else "SOT|SOP|SAM"
         owner_role = "Modelist" if family == "MARKER" else "ME"
         kpi_group = "RFT" if module_name.endswith("RFT") else "准时交付"
         return filtered[
@@ -1007,8 +1009,8 @@ with tabs[0]:
         "PPS ON TIME": tr("PPS 准时交付", "PPS ON TIME"),
         "MARKER RFT": tr("MARKER 一次通过率", "MARKER RFT"),
         "MARKER ON TIME": tr("MARKER 准时交付", "MARKER ON TIME"),
-        "SOT RFT": tr("SOT 一次通过率", "SOT RFT"),
-        "SOT ON TIME": tr("SOT 准时交付", "SOT ON TIME"),
+        "SOT RFT": tr("SAM 一次通过率", "SAM RFT"),
+        "SOT ON TIME": tr("SAM 准时交付率", "SAM ON TIME"),
     }
     module_button_labels = {}
     for option in module_options:
